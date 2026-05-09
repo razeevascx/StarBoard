@@ -16,9 +16,6 @@ export default defineConfig({
     outDir: "dist",
     emptyOutDir: true,
     sourcemap: true,
-    watch: {
-      include: "/**",
-    },
     rollupOptions: {
       output: {
         entryFileNames: `assets/[name].js`,
