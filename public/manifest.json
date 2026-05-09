@@ -1,15 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "Custom New Tab",
-  "description": "A beautiful custom new tab page with search, apps, and inspiration",
+  "name": "New Tab",
   "version": "1.0.0",
+  "description": "Minimalist startpage for Chrome",
+  "permissions": ["bookmarks", "storage"],
   "chrome_url_overrides": {
     "newtab": "index.html"
-  },
-  "permissions": ["storage"],
-  "optional_permissions": ["bookmarks"],
-
-  "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'"
   }
+
 }
