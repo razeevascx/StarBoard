@@ -1,0 +1,27 @@
+name: Package Extension
+
+on:
+  push:
+    tags:
+      - 'v*' # Runs when you push a tag like v1.0.0
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Install & Package
+        run: |
+          bun install
+          bun run package
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: new-tab-extension.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
