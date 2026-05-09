@@ -1,141 +1,192 @@
-import { useState, useEffect } from 'react';
-import Navbar from '../components/Navbar';
+import { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
 import Greeting from '../components/Greeting';
+import Navbar from '../components/Navbar';
 import Clock from '../components/Clock';
 import Calendar from '../components/Calendar';
 import SearchBar from '../components/SearchBar';
 import QuickLinks from '../components/QuickLinks';
 
 import Box from '../components/Box';
-import Settings from '../components/Settings';
+import { cn } from '../lib/cn';
+import { checkPermissions, fetchTopSites, requestPermission, removePermission, type PermissionState } from '../lib/browser';
+import {
+  fetchInitialBookmarks,
+  toBookmarkLinks,
+  supportsBookmarks,
+  selectBookmarkFolder,
+  type BookmarkLink,
+  type FolderItem,
+} from '../lib/bookmark';
+import {
+  addQuickLink as createQuickLink,
+  loadQuickLinks,
+  removeQuickLink as deleteQuickLink,
+  saveQuickLinks,
+  updateQuickLink as modifyQuickLink,
+  type LinkItem,
+} from '../lib/quicklinks';
+import {
+  getBackgroundStyle,
+  loadConfig,
+  saveConfig,
+  updateConfigValue,
+} from '../lib/settings';
+import type { AppConfig } from './types';
 
-interface AppConfig {
-  showClock: boolean;
-  showCalendar: boolean;
-  showGreeting: boolean;
-  showBookmarks: boolean;
-  syncBrowserBookmarks: boolean;
-}
-
-interface LinkItem {
-  id: string;
-  name: string;
-  url: string;
-}
-
-const DEFAULT_CONFIG: AppConfig = {
-  showClock: true,
-  showCalendar: false,
-  showGreeting: true,
-  showBookmarks: true,
-  syncBrowserBookmarks: false,
-};
-
-const INITIAL_LINKS: Record<string, LinkItem[]> = {
-  General: [
-    { id: '1', name: 'Gmail', url: 'https://mail.google.com' },
-    { id: '2', name: 'ChatGPT', url: 'https://chat.openai.com' },
-    { id: '3', name: 'Notion', url: 'https://notion.so' },
-  ],
-  Dev: [
-    { id: '4', name: 'GitHub', url: 'https://github.com' },
-    { id: '5', name: 'Vercel', url: 'https://vercel.com' },
-    { id: '6', name: 'Tailwind', url: 'https://tailwindcss.com' },
-    { id: '7', name: 'Figma', url: 'https://figma.com' },
-  ],
-  Social: [
-    { id: '8', name: 'Reddit', url: 'https://reddit.com' },
-    { id: '9', name: 'Twitter', url: 'https://twitter.com' },
-    { id: '10', name: 'Instagram', url: 'https://instagram.com' },
-    { id: '11', name: 'Discord', url: 'https://discord.com' },
-    { id: '12', name: 'LinkedIn', url: 'https://linkedin.com' },
-  ],
-  Media: [
-    { id: '13', name: 'YouTube', url: 'https://youtube.com' },
-    { id: '14', name: 'Spotify', url: 'https://spotify.com' },
-  ],
-};
-
-declare global {
-  const browser: typeof chrome | undefined;
-}
+const Settings = lazy(() => import('../components/Settings'));
 
 export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState('General');
   const [browserBookmarks, setBrowserBookmarks] = useState<chrome.bookmarks.BookmarkTreeNode[]>([]);
-  const [customLinks, setCustomLinks] = useState<Record<string, LinkItem[]>>(() => {
-    const saved = localStorage.getItem('startpage-links');
-    return saved ? JSON.parse(saved) : INITIAL_LINKS;
+  const [topLevelFolders, setTopLevelFolders] = useState<FolderItem[]>([]);
+  const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
+  const [topSites, setTopSites] = useState<LinkItem[]>([]);
+  const [quickLinks, setQuickLinks] = useState<LinkItem[]>(() => {
+    return loadQuickLinks();
   });
+  const [hasPermission, setHasPermission] = useState<PermissionState>({
+    bookmarks: false,
+    topSites: false,
+  });
+
   const [config, setConfig] = useState<AppConfig>(() => {
-    const saved = localStorage.getItem('startpage-config');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      return { ...DEFAULT_CONFIG, ...parsed };
-    }
-    return DEFAULT_CONFIG;
+    return loadConfig();
   });
+
+  const handlePermissionStateChange = useCallback((perm: 'bookmarks' | 'topSites') => {
+    setHasPermission((prev) => ({ ...prev, [perm]: true }));
+  }, []);
+
+  const handlePermissionRevoked = useCallback((perm: 'bookmarks' | 'topSites') => {
+    setHasPermission((prev) => ({ ...prev, [perm]: false }));
+    if (perm === 'bookmarks') {
+      setTopLevelFolders([]);
+      setActiveFolderId(null);
+      setBrowserBookmarks([]);
+    }
+    if (perm === 'topSites') {
+      setTopSites([]);
+    }
+  }, []);
+
+  const handleFolderSelect = useCallback((id: string) => {
+    selectBookmarkFolder(id, setActiveFolderId, setBrowserBookmarks);
+  }, []);
+
+  const handlePermissionToggle = useCallback((perm: 'bookmarks' | 'topSites', enabled: boolean) => {
+    if (enabled) {
+      requestPermission(
+        perm,
+        () => {
+          if (perm === 'bookmarks') {
+            fetchInitialBookmarks(setTopLevelFolders, setActiveFolderId, setBrowserBookmarks);
+          }
+          if (perm === 'topSites') {
+            fetchTopSites(setTopSites);
+          }
+        },
+        handlePermissionStateChange,
+      );
+      return;
+    }
+
+    removePermission(
+      perm,
+      () => {},
+      handlePermissionRevoked,
+    );
+  }, [handlePermissionRevoked, handlePermissionStateChange]);
+
+  const handleTopSitesRefresh = useCallback(() => {
+    fetchTopSites(setTopSites);
+  }, []);
 
   useEffect(() => {
-    localStorage.setItem('startpage-config', JSON.stringify(config));
-    localStorage.setItem('startpage-links', JSON.stringify(customLinks));
-    
-    const browserApi = typeof chrome !== 'undefined' ? chrome : (typeof browser !== 'undefined' ? browser : null);
+    checkPermissions(setHasPermission);
+  }, []);
 
-    if (config.syncBrowserBookmarks && browserApi && browserApi.bookmarks) {
-      browserApi.bookmarks.getTree((tree: chrome.bookmarks.BookmarkTreeNode[]) => {
-        const bookmarksBar = tree[0]?.children?.find((child) => 
-          child.title.toLowerCase().includes('bar') || child.id === '1' || child.title.toLowerCase().includes('bookmarks')
-        );
-        setBrowserBookmarks(bookmarksBar?.children || []);
-      });
+  useEffect(() => {
+    if (hasPermission.bookmarks && config.showBookmarks && supportsBookmarks()) {
+      fetchInitialBookmarks(setTopLevelFolders, setActiveFolderId, setBrowserBookmarks);
     }
-  }, [config, customLinks]);
+    if (hasPermission.topSites) {
+      handleTopSitesRefresh();
+    }
+  }, [hasPermission, config.showBookmarks, handleTopSitesRefresh]);
 
-  const updateConfig = (key: string, value: boolean) => {
-    setConfig(prev => ({ ...prev, [key]: value }));
-  };
+  useEffect(() => {
+    saveConfig(config);
+  }, [config]);
 
-  const addLink = (category: string, name: string, url: string) => {
-    const newLink = { id: crypto.randomUUID(), name, url };
-    setCustomLinks(prev => ({
-      ...prev,
-      [category]: [...(prev[category] || []), newLink]
-    }));
-  };
+  useEffect(() => {
+    saveQuickLinks(quickLinks);
+  }, [quickLinks]);
 
-  const removeLink = (category: string, id: string) => {
-    setCustomLinks((prev) => ({
-      ...prev,
-      [category]: prev[category].filter(l => l.id !== id)
-    }));
-  };
+  const handleAddQuickLink = useCallback((name: string, url: string) => {
+    setQuickLinks((prev) => createQuickLink(prev, name, url));
+  }, []);
+
+  const handleRemoveQuickLink = useCallback((id: string) => {
+    setQuickLinks((prev) => deleteQuickLink(prev, id));
+  }, []);
+
+  const handleUpdateQuickLink = useCallback((id: string, name: string, url: string) => {
+    setQuickLinks((prev) => modifyQuickLink(prev, id, name, url));
+  }, []);
+
+  const bookmarkLinks = useMemo<BookmarkLink[]>(
+    () => toBookmarkLinks(browserBookmarks),
+    [browserBookmarks],
+  );
+
+  const updateConfig = useCallback((key: keyof AppConfig, value: AppConfig[keyof AppConfig]) => {
+    setConfig((prev) => updateConfigValue(prev, key, value));
+  }, []);
+
+  const backgroundStyle = useMemo(() => getBackgroundStyle(config), [config]);
+  const bookmarkSupportError = hasPermission.bookmarks && config.showBookmarks && !supportsBookmarks()
+    ? 'Bookmarks are not supported in this browser.'
+    : null;
+
+  const handleSettingsOpen = useCallback(() => setIsSettingsOpen(true), []);
+  const handleSettingsClose = useCallback(() => setIsSettingsOpen(false), []);
+  const handleHomeClick = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-ctp-mantle via-ctp-base to-ctp-base text-ctp-text selection:bg-ctp-mauve/30 overflow-x-hidden pt-16">
-      <Navbar 
-        onSettingsClick={() => setIsSettingsOpen(true)} 
+    <main
+      className={cn(
+        "min-h-screen text-ctp-text selection:bg-ctp-mauve/30 overflow-x-hidden pt-16 transition-all duration-700",
+        config.bgType === "gradient" &&
+          "from-ctp-mantle via-ctp-base to-ctp-base",
+      )}
+      style={backgroundStyle}
+    >
+      <Navbar
+        onSettingsClick={handleSettingsOpen}
+        onHomeClick={handleHomeClick}
         showBookmarks={config.showBookmarks}
-        syncBrowserBookmarks={config.syncBrowserBookmarks}
-        browserBookmarks={browserBookmarks}
-        activeCategory={activeCategory}
-        onCategoryChange={setActiveCategory}
+        folders={topLevelFolders}
+        activeFolderId={activeFolderId}
+        onFolderSelect={handleFolderSelect}
       />
 
-      <Settings
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        config={config}
-        updateConfig={updateConfig}
-        customLinks={customLinks}
-        onAddLink={addLink}
-        onRemoveLink={removeLink}
-      />
+      <Suspense fallback={null}>
+        <Settings
+          isOpen={isSettingsOpen}
+          onClose={handleSettingsClose}
+          config={config}
+          updateConfig={updateConfig}
+          hasPermission={hasPermission}
+          onTogglePermission={handlePermissionToggle}
+          quickLinks={quickLinks}
+          onAddQuickLink={handleAddQuickLink}
+          onRemoveQuickLink={handleRemoveQuickLink}
+          onUpdateQuickLink={handleUpdateQuickLink}
+        />
+      </Suspense>
 
-      {/* Background Decor */}
-      <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-ctp-mauve/5 rounded-full blur-[120px] pointer-events-none" />
-      <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-ctp-blue/5 rounded-full blur-[120px] pointer-events-none" />
 
       <Box className="min-h-screen flex flex-col items-center justify-center p-8 relative z-10 space-y-10">
         {config.showGreeting && <Greeting />}
@@ -147,12 +198,27 @@ export default function App() {
 
         <SearchBar />
 
-        <QuickLinks links={customLinks[activeCategory] || []} />
+        <div className="w-full max-w-6xl mx-auto space-y-20 pb-24">
+          <div className="space-y-4">
+            <QuickLinks
+              links={hasPermission.topSites ? topSites : quickLinks}
+            />
+            {bookmarkSupportError ? (
+              <div className="mx-auto max-w-3xl  border border-ctp-red/30 bg-ctp-red/10 px-6 py-4 text-center text-sm font-medium text-ctp-red">
+                {bookmarkSupportError}
+              </div>
+            ) : (
+              config.showBookmarks &&
+              hasPermission.bookmarks &&
+              bookmarkLinks.length > 0 && (
+                <div className="space-y-4 animate-in fade-in duration-700">
+                  <QuickLinks links={bookmarkLinks} />
+                </div>
+              )
+            )}
+          </div>
+        </div>
       </Box>
-
-      <footer className="fixed bottom-6 w-full text-center text-ctp-overlay0 text-[10px] font-bold tracking-[0.3em] uppercase opacity-30 hover:opacity-100 transition-opacity cursor-default">
-        Engineered for Focus &bull; Catppuccin v1.0
-      </footer>
     </main>
   );
 }
