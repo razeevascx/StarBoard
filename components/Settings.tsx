@@ -24,9 +24,8 @@ interface SettingsProps {
   updateConfig: (key: keyof AppConfig, value: AppConfig[keyof AppConfig]) => void;
   hasPermission: {
     bookmarks: boolean;
-    topSites: boolean;
   };
-  onTogglePermission: (perm: 'bookmarks' | 'topSites', enabled: boolean) => void;
+  onTogglePermission: (perm: 'bookmarks', enabled: boolean) => void;
   quickLinks: LinkItem[];
   onAddQuickLink: (name: string, url: string) => void;
   onRemoveQuickLink: (id: string) => void;

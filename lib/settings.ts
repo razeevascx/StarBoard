@@ -6,7 +6,7 @@ export const DEFAULT_CONFIG: AppConfig = {
   showClock: true,
   showCalendar: false,
   showGreeting: true,
-  showBookmarks: true,
+  showBookmarks: false,
   bgType: "gradient",
   bgValue: DEFAULT_GRADIENT_BACKGROUND,
 };

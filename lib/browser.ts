@@ -10,7 +10,6 @@ interface BraveNavigator extends Navigator {
 
 export interface PermissionState {
   bookmarks: boolean;
-  topSites: boolean;
 }
 
 const userAgent = typeof navigator !== "undefined" ? navigator.userAgent.toLowerCase() : "";
@@ -47,30 +46,33 @@ export function checkPermissions(setHasPermission: Dispatch<SetStateAction<Permi
   chrome.permissions.contains({ permissions: ["bookmarks"] }, (result) => {
     setHasPermission((prev) => ({ ...prev, bookmarks: result }));
   });
-  chrome.permissions.contains({ permissions: ["topSites"] }, (result) => {
-    setHasPermission((prev) => ({ ...prev, topSites: result }));
-  });
 }
 
 export function requestPermission(
-  perm: "bookmarks" | "topSites",
+  perm: "bookmarks",
   onGranted: () => void,
-  onPermissionStateChange: (perm: "bookmarks" | "topSites") => void,
+  onPermissionStateChange: (perm: "bookmarks") => void,
+  onDenied?: () => void,
 ) {
-  if (typeof chrome === "undefined" || !chrome.permissions) return;
+  if (typeof chrome === "undefined" || !chrome.permissions) {
+    onDenied?.();
+    return;
+  }
 
   chrome.permissions.request({ permissions: [perm] }, (granted) => {
     if (granted) {
       onPermissionStateChange(perm);
       onGranted();
+    } else {
+      onDenied?.();
     }
   });
 }
 
 export function removePermission(
-  perm: "bookmarks" | "topSites",
+  perm: "bookmarks",
   onRevoked: () => void,
-  onPermissionStateChange: (perm: "bookmarks" | "topSites") => void,
+  onPermissionStateChange: (perm: "bookmarks") => void,
 ) {
   if (typeof chrome === "undefined" || !chrome.permissions) return;
 
@@ -79,21 +81,5 @@ export function removePermission(
       onPermissionStateChange(perm);
       onRevoked();
     }
-  });
-}
-
-export function fetchTopSites(
-  setTopSites: (sites: Array<{ id: string; name: string; url: string }>) => void,
-) {
-  if (typeof chrome === "undefined" || !chrome.topSites) return;
-
-  chrome.topSites.get((sites) => {
-    setTopSites(
-      sites.map((site, index) => ({
-        id: `top-${index}`,
-        name: site.title,
-        url: site.url,
-      })),
-    );
   });
 }

@@ -8,7 +8,7 @@ import QuickLinks from '../components/QuickLinks';
 
 import Box from '../components/Box';
 import { cn } from '../lib/cn';
-import { checkPermissions, fetchTopSites, requestPermission, removePermission, type PermissionState } from '../lib/browser';
+import { checkPermissions, requestPermission, removePermission, type PermissionState } from '../lib/browser';
 import {
   fetchInitialBookmarks,
   toBookmarkLinks,
@@ -40,52 +40,54 @@ export default function App() {
   const [browserBookmarks, setBrowserBookmarks] = useState<chrome.bookmarks.BookmarkTreeNode[]>([]);
   const [topLevelFolders, setTopLevelFolders] = useState<FolderItem[]>([]);
   const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
-  const [topSites, setTopSites] = useState<LinkItem[]>([]);
   const [quickLinks, setQuickLinks] = useState<LinkItem[]>(() => {
     return loadQuickLinks();
   });
   const [hasPermission, setHasPermission] = useState<PermissionState>({
     bookmarks: false,
-    topSites: false,
   });
 
   const [config, setConfig] = useState<AppConfig>(() => {
     return loadConfig();
   });
 
-  const handlePermissionStateChange = useCallback((perm: 'bookmarks' | 'topSites') => {
+  const [permissionError, setPermissionError] = useState<string | null>(null);
+
+  const handlePermissionStateChange = useCallback((perm: 'bookmarks') => {
     setHasPermission((prev) => ({ ...prev, [perm]: true }));
+    setPermissionError(null);
   }, []);
 
-  const handlePermissionRevoked = useCallback((perm: 'bookmarks' | 'topSites') => {
+  const handlePermissionRevoked = useCallback((perm: 'bookmarks') => {
     setHasPermission((prev) => ({ ...prev, [perm]: false }));
     if (perm === 'bookmarks') {
       setTopLevelFolders([]);
       setActiveFolderId(null);
       setBrowserBookmarks([]);
     }
-    if (perm === 'topSites') {
-      setTopSites([]);
-    }
   }, []);
 
   const handleFolderSelect = useCallback((id: string) => {
-    selectBookmarkFolder(id, setActiveFolderId, setBrowserBookmarks);
+    selectBookmarkFolder(id, setActiveFolderId, setBrowserBookmarks, setPermissionError);
   }, []);
 
-  const handlePermissionToggle = useCallback((perm: 'bookmarks' | 'topSites', enabled: boolean) => {
+  const handlePermissionToggle = useCallback((perm: 'bookmarks', enabled: boolean) => {
     if (enabled) {
       requestPermission(
         perm,
         () => {
           if (perm === 'bookmarks') {
-            fetchInitialBookmarks(setTopLevelFolders, setActiveFolderId, setBrowserBookmarks);
-          }
-          if (perm === 'topSites') {
-            fetchTopSites(setTopSites);
+            fetchInitialBookmarks(setTopLevelFolders, setActiveFolderId, setBrowserBookmarks, setPermissionError);
           }
         },
         handlePermissionStateChange,
+        () => {
+          setPermissionError(`Permission for ${perm} was denied.`);
+          // If permission is denied, we should also ensure the component is hidden if it was just being enabled
+          if (perm === 'bookmarks') {
+             setConfig(prev => ({ ...prev, showBookmarks: false }));
+          }
+        }
       );
       return;
     }
@@ -97,22 +99,15 @@ export default function App() {
     );
   }, [handlePermissionRevoked, handlePermissionStateChange]);
 
-  const handleTopSitesRefresh = useCallback(() => {
-    fetchTopSites(setTopSites);
-  }, []);
-
   useEffect(() => {
     checkPermissions(setHasPermission);
   }, []);
 
   useEffect(() => {
     if (hasPermission.bookmarks && config.showBookmarks && supportsBookmarks()) {
-      fetchInitialBookmarks(setTopLevelFolders, setActiveFolderId, setBrowserBookmarks);
+      fetchInitialBookmarks(setTopLevelFolders, setActiveFolderId, setBrowserBookmarks, setPermissionError);
     }
-    if (hasPermission.topSites) {
-      handleTopSitesRefresh();
-    }
-  }, [hasPermission, config.showBookmarks, handleTopSitesRefresh]);
+  }, [hasPermission, config.showBookmarks]);
 
   useEffect(() => {
     saveConfig(config);
@@ -140,13 +135,22 @@ export default function App() {
   );
 
   const updateConfig = useCallback((key: keyof AppConfig, value: AppConfig[keyof AppConfig]) => {
+    if (key === 'showBookmarks' && value === true) {
+      if (!supportsBookmarks()) {
+        setPermissionError("Bookmarks are not supported in this browser.");
+        return;
+      }
+      if (!hasPermission.bookmarks) {
+        handlePermissionToggle('bookmarks', true);
+      }
+    }
     setConfig((prev) => updateConfigValue(prev, key, value));
-  }, []);
+  }, [hasPermission.bookmarks, handlePermissionToggle]);
 
   const backgroundStyle = useMemo(() => getBackgroundStyle(config), [config]);
   const bookmarkSupportError = hasPermission.bookmarks && config.showBookmarks && !supportsBookmarks()
     ? 'Bookmarks are not supported in this browser.'
-    : null;
+    : permissionError;
 
   const handleSettingsOpen = useCallback(() => setIsSettingsOpen(true), []);
   const handleSettingsClose = useCallback(() => setIsSettingsOpen(false), []);
@@ -201,7 +205,7 @@ export default function App() {
         <div className="w-full max-w-6xl mx-auto space-y-20 pb-24">
           <div className="space-y-4">
             <QuickLinks
-              links={hasPermission.topSites ? topSites : quickLinks}
+              links={quickLinks}
             />
             {bookmarkSupportError ? (
               <div className="mx-auto max-w-3xl  border border-ctp-red/30 bg-ctp-red/10 px-6 py-4 text-center text-sm font-medium text-ctp-red">

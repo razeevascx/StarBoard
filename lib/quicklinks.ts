@@ -5,12 +5,9 @@ export interface LinkItem {
 }
 
 export const POPULAR_APPS: LinkItem[] = [
-  { id: "p1", name: "Gmail", url: "https://mail.google.com" },
+  { id: "p1", name: "Gmail", url: "https://gmail.com" },
   { id: "p2", name: "YouTube", url: "https://youtube.com" },
   { id: "p3", name: "GitHub", url: "https://github.com" },
-  { id: "p4", name: "ChatGPT", url: "https://chat.openai.com" },
-  { id: "p5", name: "WhatsApp", url: "https://web.whatsapp.com" },
-  { id: "p6", name: "Netflix", url: "https://netflix.com" },
   { id: "p7", name: "Spotify", url: "https://spotify.com" },
 ];
 

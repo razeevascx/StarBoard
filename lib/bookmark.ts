@@ -38,10 +38,18 @@ export function toBookmarkLinks(bookmarks: chrome.bookmarks.BookmarkTreeNode[]):
 export function fetchFolderContents(
   folderId: string,
   setBrowserBookmarks: (bookmarks: chrome.bookmarks.BookmarkTreeNode[]) => void,
+  onError?: (error: string) => void,
 ) {
-  if (!supportsBookmarks()) return;
+  if (!supportsBookmarks()) {
+    onError?.("Bookmarks are not supported.");
+    return;
+  }
 
   chrome.bookmarks.getChildren(folderId, (children) => {
+    if (chrome.runtime.lastError) {
+      onError?.(chrome.runtime.lastError.message || "Failed to fetch bookmarks.");
+      return;
+    }
     setBrowserBookmarks(children);
   });
 }
@@ -50,25 +58,35 @@ export function selectBookmarkFolder(
   folderId: string,
   setActiveFolderId: (folderId: string) => void,
   setBrowserBookmarks: (bookmarks: chrome.bookmarks.BookmarkTreeNode[]) => void,
+  onError?: (error: string) => void,
 ) {
   setActiveFolderId(folderId);
-  fetchFolderContents(folderId, setBrowserBookmarks);
+  fetchFolderContents(folderId, setBrowserBookmarks, onError);
 }
 
 export function fetchInitialBookmarks(
   setTopLevelFolders: (folders: FolderItem[]) => void,
   setActiveFolderId: (folderId: string) => void,
   setBrowserBookmarks: (bookmarks: chrome.bookmarks.BookmarkTreeNode[]) => void,
+  onError?: (error: string) => void,
 ) {
-  if (!supportsBookmarks()) return;
+  if (!supportsBookmarks()) {
+    onError?.("Bookmarks are not supported.");
+    return;
+  }
 
   chrome.bookmarks.getTree((tree) => {
+    if (chrome.runtime.lastError) {
+      onError?.(chrome.runtime.lastError.message || "Failed to fetch bookmarks.");
+      return;
+    }
+
     const bookmarksBar = getBookmarksBar(tree);
     const folders = getTopLevelFolders(bookmarksBar);
     setTopLevelFolders(folders);
 
     const initialFolder = getInitialFolderId(folders, bookmarksBar);
     setActiveFolderId(initialFolder);
-    fetchFolderContents(initialFolder, setBrowserBookmarks);
+    fetchFolderContents(initialFolder, setBrowserBookmarks, onError);
   });
 }

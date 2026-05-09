@@ -54,7 +54,7 @@ const QuickLinks = memo(function QuickLinks({ links = [], onFolderClick }: Quick
                 alt=""
                 className="w-full h-full object-contain"
                 onError={(event) => {
-                  event.currentTarget.src = getFallbackFaviconUrl();
+                  event.currentTarget.src = getFallbackFaviconUrl(app.url ?? '');
                 }}
               />
             </div>

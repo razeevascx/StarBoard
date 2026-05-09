@@ -1,5 +1,5 @@
 import { GitHubDark } from '@ridemountainpig/svgl-react';
-import { Settings, LayoutGrid } from 'lucide-react';
+import { Settings} from 'lucide-react';
 import { cn } from '../lib/cn';
 import { memo } from 'react';
 
@@ -40,11 +40,11 @@ const Navbar = memo(function Navbar({
           onClick={onHomeClick}
           className="flex items-center space-x-3 group/brand transition-all hover:opacity-80 flex-shrink-0"
         >
-          <div className="w-8 h-8 p-1.5 rounded-lg bg-ctp-mauve/20 border border-ctp-mauve/30 text-ctp-mauve group-hover/brand:bg-ctp-mauve group-hover/brand:text-ctp-base transition-all duration-500">
-            <LayoutGrid className="w-full h-full " />
+          <div className="size-10 p-1.5  bg-ctp-mauve/20 border border-ctp-mauve/30 text-ctp-mauve group-hover/brand:bg-ctp-mauve group-hover/brand:text-ctp-base transition-all duration-500">
+            <img src="favicon.svg" alt="start page logo" className="w-full h-full" />
           </div>
           <span className="font-black tracking-tighter text-lg text-ctp-text opacity-80 group-hover/brand:opacity-100 transition-opacity uppercase">
-            New Tab
+            StartPage
           </span>
         </button>
       </div>

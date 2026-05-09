@@ -3,7 +3,7 @@
   "name": "New Tab",
   "version": "1.0.0",
   "description": "Minimalist startpage for Chrome",
-  "permissions": ["bookmarks", "storage", "topSites", "favicon", "unlimitedStorage"],
+  "permissions": ["bookmarks", "storage", "favicon", "unlimitedStorage"],
   "chrome_url_overrides": {
     "newtab": "index.html"
   }
