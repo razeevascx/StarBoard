@@ -4,8 +4,8 @@
 
 *A minimalist Chrome start page that turns every new tab into a calm, customizable command center.*
 
-![Last Commit](https://img.shields.io/github/last-commit/razeevascx/new-tab?style=for-the-badge&logo=git&logoColor=D9E0EE&labelColor=1E202B&color=8ad7eb)
-![Languages](https://img.shields.io/github/languages/top/razeevascx/new-tab?style=for-the-badge&logo=github&logoColor=D9E0EE&labelColor=1E202B&color=86dbd7)
+![Last Commit](https://img.shields.io/github/last-commit/razeevascx/startpage?style=for-the-badge&logo=git&logoColor=D9E0EE&labelColor=1E202B&color=8ad7eb)
+![Languages](https://img.shields.io/github/languages/top/razeevascx/startpage?style=for-the-badge&logo=github&logoColor=D9E0EE&labelColor=1E202B&color=86dbd7)
 
 **Built with:**
 
@@ -39,6 +39,14 @@ The app stores preferences locally and lets you opt into browser permissions onl
 - **Browser Platform:** Chrome Extension Manifest V3, Chrome bookmarks/topSites/storage APIs
 - **Tooling:** Bun, ESLint, React Compiler plugin, Babel
 
+## Scripts
+
+- **`bun run dev`** — Start the Vite dev server for local iteration.
+- **`bun run build`** — Type-check the project and build the extension into `dist/`.
+- **`bun run package`** — Build the extension and create `new-tab-extension.zip`.
+- **`bun run preview`** — Preview the built app locally with Vite.
+- **`bun run lint`** — Run ESLint across the codebase.
+
 ## Getting Started
 
 ### Prerequisites
@@ -50,12 +58,12 @@ The app stores preferences locally and lets you opt into browser permissions onl
 
 1. **Clone the repository**
 	```bash
-	git clone https://github.com/razeevascx/new-tab.git
+	git clone https://github.com/razeevascx/startpage.git
 	```
 
 2. **Navigate to the project directory**
 	```bash
-	cd new-tab
+	cd startpage
 	```
 
 3. **Install dependencies**
