@@ -32,17 +32,17 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: new-tab-extension.zip
+          files: startpage-extension.zip
           name: "Release ${{ github.ref_name }}"
           generate_release_notes: true
           draft: false
           prerelease: false
           body: |
             ##  StartPage Extension Build
-            Install this by downloading the `new-tab-extension.zip` below and loading it into your browser (Developer Mode).
+            Install this by downloading the `startpage-extension.zip` below and loading it into your browser (Developer Mode).
 
             ### 🛠 Installation
-            1. Download `new-tab-extension.zip`.
+            1. Download `startpage-extension.zip`.
             2. Unzip the folder.
             3. Go to `chrome://extensions`.
             4. Enable **Developer Mode**.
