@@ -3,8 +3,8 @@ import Greeting from '../components/Greeting';
 import Navbar from '../components/Navbar';
 import Clock from '../components/Clock';
 import Calendar from '../components/Calendar';
-import SearchBar from '../components/SearchBar';
 import QuickLinks from '../components/QuickLinks';
+import BookmarkManager from '../components/BookmarkManager';
 
 import Box from '../components/Box';
 import { cn } from '../lib/cn';
@@ -51,11 +51,8 @@ export default function App() {
     return loadConfig();
   });
 
-  const [permissionError, setPermissionError] = useState<string | null>(null);
-
   const handlePermissionStateChange = useCallback((perm: 'bookmarks') => {
     setHasPermission((prev) => ({ ...prev, [perm]: true }));
-    setPermissionError(null);
   }, []);
 
   const handlePermissionRevoked = useCallback((perm: 'bookmarks') => {
@@ -68,7 +65,7 @@ export default function App() {
   }, []);
 
   const handleFolderSelect = useCallback((id: string) => {
-    selectBookmarkFolder(id, setActiveFolderId, setBrowserBookmarks, setPermissionError);
+    selectBookmarkFolder(id, setActiveFolderId, setBrowserBookmarks, () => {});
   }, []);
 
   const handlePermissionToggle = useCallback((perm: 'bookmarks', enabled: boolean) => {
@@ -77,12 +74,11 @@ export default function App() {
         perm,
         () => {
           if (perm === 'bookmarks') {
-            fetchInitialBookmarks(setTopLevelFolders, setActiveFolderId, setBrowserBookmarks, setPermissionError);
+            fetchInitialBookmarks(setTopLevelFolders, setActiveFolderId, setBrowserBookmarks, () => {});
           }
         },
         handlePermissionStateChange,
         () => {
-          setPermissionError(`Permission for ${perm} was denied.`);
           // If permission is denied, we should also ensure the component is hidden if it was just being enabled
           if (perm === 'bookmarks') {
              setConfig(prev => ({ ...prev, showBookmarks: false }));
@@ -105,7 +101,7 @@ export default function App() {
 
   useEffect(() => {
     if (hasPermission.bookmarks && config.showBookmarks && supportsBookmarks()) {
-      fetchInitialBookmarks(setTopLevelFolders, setActiveFolderId, setBrowserBookmarks, setPermissionError);
+      fetchInitialBookmarks(setTopLevelFolders, setActiveFolderId, setBrowserBookmarks, () => {});
     }
   }, [hasPermission, config.showBookmarks]);
 
@@ -137,7 +133,6 @@ export default function App() {
   const updateConfig = useCallback((key: keyof AppConfig, value: AppConfig[keyof AppConfig]) => {
     if (key === 'showBookmarks' && value === true) {
       if (!supportsBookmarks()) {
-        setPermissionError("Bookmarks are not supported in this browser.");
         return;
       }
       if (!hasPermission.bookmarks) {
@@ -148,9 +143,7 @@ export default function App() {
   }, [hasPermission.bookmarks, handlePermissionToggle]);
 
   const backgroundStyle = useMemo(() => getBackgroundStyle(config), [config]);
-  const bookmarkSupportError = hasPermission.bookmarks && config.showBookmarks && !supportsBookmarks()
-    ? 'Bookmarks are not supported in this browser.'
-    : permissionError;
+
 
   const handleSettingsOpen = useCallback(() => setIsSettingsOpen(true), []);
   const handleSettingsClose = useCallback(() => setIsSettingsOpen(false), []);
@@ -170,10 +163,6 @@ export default function App() {
       <Navbar
         onSettingsClick={handleSettingsOpen}
         onHomeClick={handleHomeClick}
-        showBookmarks={config.showBookmarks}
-        folders={topLevelFolders}
-        activeFolderId={activeFolderId}
-        onFolderSelect={handleFolderSelect}
       />
 
       <Suspense fallback={null}>
@@ -191,37 +180,23 @@ export default function App() {
         />
       </Suspense>
 
-
-      <Box className="min-h-screen flex flex-col items-center justify-center p-8 relative z-10 space-y-10">
+      <Box className="flex flex-col items-center justify-center p-8 relative z-10 space-y-10">
         {config.showGreeting && <Greeting />}
 
         <div className="flex flex-col lg:flex-row items-center justify-center gap-12 w-full">
           {config.showClock && <Clock />}
           {config.showCalendar && <Calendar />}
         </div>
+        <QuickLinks links={quickLinks} />
 
-        <SearchBar />
-
-        <div className="w-full max-w-6xl mx-auto space-y-20 pb-24">
-          <div className="space-y-4">
-            <QuickLinks
-              links={quickLinks}
-            />
-            {bookmarkSupportError ? (
-              <div className="mx-auto max-w-3xl  border border-ctp-red/30 bg-ctp-red/10 px-6 py-4 text-center text-sm font-medium text-ctp-red">
-                {bookmarkSupportError}
-              </div>
-            ) : (
-              config.showBookmarks &&
-              hasPermission.bookmarks &&
-              bookmarkLinks.length > 0 && (
-                <div className="space-y-4 animate-in fade-in duration-700">
-                  <QuickLinks links={bookmarkLinks} />
-                </div>
-              )
-            )}
-          </div>
-        </div>
+        {config.showBookmarks && hasPermission.bookmarks && (
+          <BookmarkManager
+            bookmarkLinks={bookmarkLinks}
+            folders={topLevelFolders}
+            activeFolderId={activeFolderId}
+            onFolderSelect={handleFolderSelect}
+          />
+        )}
       </Box>
     </main>
   );

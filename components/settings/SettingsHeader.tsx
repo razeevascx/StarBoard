@@ -1,7 +1,7 @@
 import { X } from 'lucide-react';
 import { cn } from '../../lib/cn';
 
-type Tab = 'general' | 'links' | 'appearance';
+type Tab = 'general' | 'links'  ;
 
 type SettingsHeaderProps = Readonly<{
   activeTab: Tab;
@@ -11,7 +11,6 @@ type SettingsHeaderProps = Readonly<{
 
 const TAB_LABELS: Readonly<Record<Tab, string>> = {
   general: 'General',
-  appearance: 'Appearance',
   links: 'Quick Links',
 };
 

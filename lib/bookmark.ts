@@ -15,14 +15,36 @@ export function supportsBookmarks() {
 
 export function getBookmarksBar(tree: chrome.bookmarks.BookmarkTreeNode[]) {
   return tree[0]?.children?.find((child) =>
-    child.title.toLowerCase().includes("bar") ||
     child.id === "1" ||
+    child.title.toLowerCase().includes("bar") ||
     child.title.toLowerCase().includes("bookmarks"),
   );
 }
 
-export function getTopLevelFolders(bookmarksBar?: chrome.bookmarks.BookmarkTreeNode) {
-  return bookmarksBar?.children?.filter((bm) => !bm.url).map((bm) => ({ id: bm.id, title: bm.title })) ?? [];
+export function getOtherBookmarks(tree: chrome.bookmarks.BookmarkTreeNode[]) {
+  return tree[0]?.children?.find((child) =>
+    child.id === "2" ||
+    child.title.toLowerCase().includes("other")
+  );
+}
+
+export function getTopLevelFolders(
+  bookmarksBar?: chrome.bookmarks.BookmarkTreeNode,
+  otherBookmarks?: chrome.bookmarks.BookmarkTreeNode
+) {
+  const categories: FolderItem[] = [];
+
+  if (bookmarksBar && bookmarksBar.children && bookmarksBar.children.length > 0) {
+    categories.push({ id: bookmarksBar.id, title: "Bookmarks Bar" });
+  }
+
+  if (otherBookmarks && otherBookmarks.children && otherBookmarks.children.length > 0) {
+    categories.push({ id: otherBookmarks.id, title: "Other Bookmarks" });
+  }
+
+  const subfolders = bookmarksBar?.children?.filter((bm) => !bm.url).map((bm) => ({ id: bm.id, title: bm.title })) ?? [];
+
+  return [...categories, ...subfolders];
 }
 
 export function getInitialFolderId(folders: FolderItem[], bookmarksBar?: chrome.bookmarks.BookmarkTreeNode) {
@@ -82,7 +104,8 @@ export function fetchInitialBookmarks(
     }
 
     const bookmarksBar = getBookmarksBar(tree);
-    const folders = getTopLevelFolders(bookmarksBar);
+    const otherBookmarks = getOtherBookmarks(tree);
+    const folders = getTopLevelFolders(bookmarksBar, otherBookmarks);
     setTopLevelFolders(folders);
 
     const initialFolder = getInitialFolderId(folders, bookmarksBar);

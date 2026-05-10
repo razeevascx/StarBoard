@@ -2,30 +2,18 @@ import { GitHubDark } from '@ridemountainpig/svgl-react';
 import { Settings} from 'lucide-react';
 import { cn } from '../lib/cn';
 import { memo } from 'react';
-
-interface FolderItem {
-  id: string;
-  title: string;
-}
+import Box from './Box';
 
 interface NavbarProps {
   className?: string;
   onSettingsClick?: () => void;
   onHomeClick?: () => void;
-  showBookmarks?: boolean;
-  folders?: FolderItem[];
-  activeFolderId?: string | null;
-  onFolderSelect?: (id: string) => void;
 }
 
 const Navbar = memo(function Navbar({
   className,
   onSettingsClick,
   onHomeClick,
-  showBookmarks,
-  folders = [],
-  activeFolderId,
-  onFolderSelect
 }: Readonly<NavbarProps>) {
   return (
     <nav
@@ -35,47 +23,20 @@ const Navbar = memo(function Navbar({
         className,
       )}
     >
+      <Box className="flex items-center justify-between w-full">
       <div className="flex items-center space-x-6 group cursor-default max-w-[85%] overflow-x-auto custom-scrollbar">
         <button
           onClick={onHomeClick}
-          className="flex items-center space-x-3 group/brand transition-all hover:opacity-80 flex-shrink-0"
+          className="flex items-center space-x-3 group/brand transition-all hover:opacity-80 shrink-0"
         >
           <div className="size-10 p-1.5  bg-ctp-mauve/20 border border-ctp-mauve/30 text-ctp-mauve group-hover/brand:bg-ctp-mauve group-hover/brand:text-ctp-base transition-all duration-500">
             <img src="favicon.svg" alt="start page logo" className="w-full h-full" />
           </div>
-          <span className="font-black tracking-tighter text-lg text-ctp-text opacity-80 group-hover/brand:opacity-100 transition-opacity uppercase">
-            StartPage
-          </span>
+
         </button>
       </div>
 
       <div className="flex items-center space-x-6 shrink-0">
-        {showBookmarks && folders.length > 0 && (
-          <div className="flex items-center space-x-3 animate-in fade-in slide-in-from-left-4 duration-500 shrink-0">
-            <div className="flex items-center space-x-2">
-              <div className="flex items-center space-x-2 ml-2">
-                {folders.map((folder) => (
-                  <button
-                    key={folder.id}
-                    onClick={() => onFolderSelect?.(folder.id)}
-                    className={cn(
-                      "flex items-center space-x-2 px-4 py-1.5  border transition-all group/folder whitespace-nowrap",
-                      activeFolderId === folder.id
-                        ? "bg-ctp-mauve text-ctp-base border-ctp-mauve shadow-lg shadow-ctp-mauve/20"
-                        : "bg-ctp-surface0/20 border-ctp-surface1/10 text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text hover:border-ctp-surface1/30",
-                    )}
-                  >
-                    <span className="text-[10px] font-black uppercase tracking-widest">
-                      {folder.title}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-        <div className="h-4 w-px bg-ctp-surface1/50 mr-4" />
-
         <a
           href="https://github.com"
           target="_blank"
@@ -93,6 +54,7 @@ const Navbar = memo(function Navbar({
           <Settings className="w-6 h-6" />
         </button>
       </div>
+      </Box>
     </nav>
   );
 });

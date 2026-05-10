@@ -1,14 +1,8 @@
-import { useState, type ChangeEvent, type FormEvent, useRef, memo } from 'react';
-import {
-  applyGradientBackground,
-  applyImageBackground,
-  applySolidBackground,
-  readImageFile,
-} from '../lib/settings';
+import { useState,  type FormEvent,  memo } from 'react';
+
 import type { AppConfig } from '../src/types';
 import SettingsHeader from './settings/SettingsHeader';
 import GeneralSettingsPanel from './settings/GeneralSettingsPanel';
-import AppearanceSettingsPanel from './settings/AppearanceSettingsPanel';
 import QuickLinksSettingsPanel from './settings/QuickLinksSettingsPanel';
 
 interface LinkItem {
@@ -44,26 +38,14 @@ const Settings = memo(function Settings({
   onRemoveQuickLink,
   onUpdateQuickLink
 }: SettingsProps) {
-  const [activeTab, setActiveTab] = useState<'general' | 'links' | 'appearance'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'links' >('general');
   const [newLink, setNewLink] = useState({ name: '', url: '' });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ name: '', url: '' });
-  const [tempBgUrl, setTempBgUrl] = useState(config.bgType === 'image' ? config.bgValue : '');
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
 
-  const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
 
-    try {
-      const base64String = await readImageFile(file);
-      applyImageBackground(updateConfig, base64String);
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const handleAdd = (e: FormEvent) => {
     e.preventDefault();
@@ -86,19 +68,7 @@ const Settings = memo(function Settings({
     setEditingId(null);
   };
 
-  const setSolidColor = (color: string) => {
-    applySolidBackground(updateConfig, color);
-  };
 
-  const setImageBg = () => {
-    if (!tempBgUrl) return;
-
-    applyImageBackground(updateConfig, tempBgUrl);
-  };
-
-  const resetToGradient = () => {
-    applyGradientBackground(updateConfig);
-  };
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
@@ -122,19 +92,7 @@ const Settings = memo(function Settings({
               onToggleConfig={updateConfig}
               onTogglePermission={onTogglePermission}
             />
-          ) : activeTab === 'appearance' ? (
-            <AppearanceSettingsPanel
-              config={config}
-              fileInputRef={fileInputRef}
-              tempBgUrl={tempBgUrl}
-              onTempBgUrlChange={setTempBgUrl}
-              onUploadClick={() => fileInputRef.current?.click()}
-              onFileChange={handleFileUpload}
-              onApplyUrl={setImageBg}
-              onSetSolidColor={setSolidColor}
-              onResetGradient={resetToGradient}
-            />
-          ) : (
+          ): (
             <QuickLinksSettingsPanel
               quickLinks={quickLinks}
               newLink={newLink}

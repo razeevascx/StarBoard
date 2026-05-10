@@ -2,12 +2,14 @@ import { cn } from '../lib/cn';
 import { Folder } from 'lucide-react';
 import { memo } from 'react';
 import { getFallbackFaviconUrl, getFaviconUrl } from '../lib/favicon';
+import { ICON_MAP } from '../lib/quicklinks';
 
 interface LinkItem {
   id: string;
   name: string;
   url?: string;
   isFolder?: boolean;
+  iconId?: string;
 }
 
 interface QuickLinksProps {
@@ -17,9 +19,11 @@ interface QuickLinksProps {
 
 const QuickLinks = memo(function QuickLinks({ links = [], onFolderClick }: QuickLinksProps) {
   return (
-    <div className="grid grid-cols-4 md:grid-cols-7 gap-6 mt-12 p-10 bg-ctp-surface0/10 backdrop-blur-xl border border-ctp-surface1/30 shadow-2xl transition-all duration-500 hover:bg-ctp-surface0/20 w-full mx-auto items-center justify-center ">
-      {links.map((app) => (
-        app.isFolder ? (
+    <div className="grid grid-cols-4 md:grid-cols-6 gap-5 p-10 bg-ctp-surface0/10 backdrop-blur-xl border border-ctp-surface1/30 shadow-2xl transition-all duration-500 hover:bg-ctp-surface0/20 w-full mx-auto items-center justify-center ">
+      {links.map((app) => {
+        const IconComponent = app.iconId ? ICON_MAP[app.iconId] : null;
+
+        return app.isFolder ? (
           <button
             key={app.id}
             onClick={() => onFolderClick?.(app.id)}
@@ -49,21 +53,25 @@ const QuickLinks = memo(function QuickLinks({ links = [], onFolderClick }: Quick
             title={app.name}
           >
             <div className="size-12 flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(203,166,247,0.4)]">
-              <img
-                src={getFaviconUrl(app.url ?? '')}
-                alt=""
-                className="w-full h-full object-contain"
-                onError={(event) => {
-                  event.currentTarget.src = getFallbackFaviconUrl(app.url ?? '');
-                }}
-              />
+              {IconComponent ? (
+                <IconComponent className="w-full h-full" />
+              ) : (
+                <img
+                  src={getFaviconUrl(app.url ?? '')}
+                  alt=""
+                  className="w-full h-full object-contain"
+                  onError={(event) => {
+                    event.currentTarget.src = getFallbackFaviconUrl(app.url ?? '');
+                  }}
+                />
+              )}
             </div>
             <span className="text-[10px] font-bold mt-3  transition-opacity uppercase tracking-[0.2em] text-ctp-subtext0 truncate max-w-25 text-center">
               {app.name}
             </span>
           </a>
-        )
-      ))}
+        );
+      })}
     </div>
   );
 });
