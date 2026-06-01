@@ -1,0 +1,54 @@
+name: Package Extension
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Important: fetch all history for better release notes
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build & Zip Extension
+        run: bun run package
+        env:
+          CI: true
+
+      - name: Create Release Page
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: startpage-extension.zip
+          name: "Release ${{ github.ref_name }}"
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+          body: |
+            ##  StartPage Extension Build
+            Install this by downloading the `startpage-extension.zip` below and loading it into your browser (Developer Mode).
+
+            ### 🛠 Installation
+            1. Download `startpage-extension.zip`.
+            2. Unzip the folder.
+            3. Go to `chrome://extensions`.
+            4. Enable **Developer Mode**.
+            5. Click **Load unpacked** and select the `dist` folder.
+
+            ---
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ github.event.before }}...${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

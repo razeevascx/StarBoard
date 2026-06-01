@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "New Tab",
+  "version": "1.0.0",
+  "description": "Minimalist startpage for Chrome",
+  "permissions": ["bookmarks", "storage", "favicon", "unlimitedStorage"],
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "icons": {
+    "16": "favicon.svg",
+    "32": "favicon.svg",
+    "48": "favicon.svg",
+    "128": "favicon.svg"
+  }
+}

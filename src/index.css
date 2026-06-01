@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+/*
+ Choose between `mocha`, `frappe` or `macchiato` for dark mode, latte is included as the light mode flavour.
+ We recommend using `mocha` for dark mode.
+*/
+@import "@catppuccin/tailwindcss/mocha.css";
+
+
+body {
+  @apply bg-ctp-base text-ctp-text;
+}
