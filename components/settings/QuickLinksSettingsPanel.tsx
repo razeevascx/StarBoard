@@ -1,4 +1,6 @@
-import { Globe, Pencil, Trash2, Plus, X } from 'lucide-react';
+import { Pencil, Trash2, Plus, X } from 'lucide-react';
+import { ICON_MAP } from '../../lib/quicklinks';
+import { getFaviconUrl, getFallbackFaviconUrl } from '../../lib/favicon';
 import type { FormEvent } from 'react';
 
 type LinkItem = {
@@ -74,7 +76,7 @@ export default function QuickLinksSettingsPanel({
                     type="text"
                     value={editForm.url}
                     onChange={(e) => onEditFormChange({ ...editForm, url: e.target.value })}
-                    className="flex-[3] bg-ctp-surface0/50 border border-ctp-mauve/30 px-3 py-1 text-xs text-ctp-text focus:outline-none"
+                    className="flex-3 bg-ctp-surface0/50 border border-ctp-mauve/30 px-3 py-1 text-xs text-ctp-text focus:outline-none"
                   />
                   <button type="submit" className="text-ctp-green hover:scale-110 transition-transform">
                     <Plus className="w-4 h-4" />
@@ -86,7 +88,23 @@ export default function QuickLinksSettingsPanel({
               ) : (
                 <>
                   <div className="flex items-center space-x-3 truncate">
-                    <Globe className="w-4 h-4 text-ctp-overlay1" />
+                    {
+                      (() => {
+                        const key = link.name.toLowerCase();
+                        const IconComp = ICON_MAP[key] ?? Object.entries(ICON_MAP).find(([k]) => link.url?.includes(k))?.[1];
+                        if (IconComp) {
+                          return <IconComp className="w-6 h-6 text-ctp-overlay1" />;
+                        }
+                        return (
+                          <img
+                            src={getFaviconUrl(link.url)}
+                            onError={(e) => (e.currentTarget.src = getFallbackFaviconUrl(link.url))}
+                            alt=""
+                            className="w-4 h-4 object-contain"
+                          />
+                        );
+                      })()
+                    }
                     <div className="truncate">
                       <p className="text-xs font-bold text-ctp-text truncate">{link.name}</p>
                       <p className="text-[10px] text-ctp-overlay1 truncate">{link.url}</p>

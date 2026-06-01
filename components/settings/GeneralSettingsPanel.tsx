@@ -30,7 +30,9 @@ export default function GeneralSettingsPanel({
         <h3 className="text-[10px] font-bold text-ctp-overlay1 uppercase tracking-[0.2em] mb-4">Toggle Components</h3>
         <div className="grid grid-cols-2 gap-3">
           {toggleEntries.map(([key, value]) => {
-            const isDisabled = key === 'showBookmarks' && !isBookmarkSupported;
+            // Allow toggling `showBookmarks` even when browser bookmark API isn't available
+            // (we show sample bookmarks in that case). Only keep other toggles enabled.
+            const isDisabled = false;
             return (
               <button
                 key={key}
@@ -66,6 +68,9 @@ export default function GeneralSettingsPanel({
               <p className="text-[10px] text-ctp-subtext0 uppercase tracking-wider">
                 {isBookmarkSupported ? "Access your Chrome bookmarks" : "Not supported in this browser"}
               </p>
+              {!hasPermission.bookmarks && config.showBookmarks && (
+                <p className="text-[10px] text-ctp-subtext0">Using sample bookmarks because browser permission is not granted.</p>
+              )}
             </div>
             {hasPermission.bookmarks ? (
               <button

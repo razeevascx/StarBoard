@@ -30,7 +30,7 @@ The app stores preferences locally and lets you opt into browser permissions onl
 
 ## Features
 
-- **Focused daily view** — Keep the page useful at a glance with an optional greeting, live clock, and monthly calendar.
+- **Focused daily view** — Keep the page useful at a glance with an optional greeting and live clock.
 - **Fast search switching** — Search through Google, DuckDuckGo, or Bing from the same command bar.
 - **Editable quick links** — Add, update, and remove shortcuts for the sites you use most, with favicon-based cards.
 - **Browser-integrated access** — Surface bookmark folders after granting permissions in Settings.

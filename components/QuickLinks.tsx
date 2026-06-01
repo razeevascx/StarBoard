@@ -1,8 +1,8 @@
-import { cn } from '../lib/cn';
-import { Folder } from 'lucide-react';
-import { memo } from 'react';
-import { getFallbackFaviconUrl, getFaviconUrl } from '../lib/favicon';
-import { ICON_MAP } from '../lib/quicklinks';
+import { cn } from "../lib/cn";
+import { Folder } from "lucide-react";
+import { memo } from "react";
+import { getFallbackFaviconUrl, getFaviconUrl } from "../lib/favicon";
+import { ICON_MAP } from "../lib/quicklinks";
 
 interface LinkItem {
   id: string;
@@ -17,9 +17,12 @@ interface QuickLinksProps {
   onFolderClick?: (id: string) => void;
 }
 
-const QuickLinks = memo(function QuickLinks({ links = [], onFolderClick }: QuickLinksProps) {
+const QuickLinks = memo(function QuickLinks({
+  links = [],
+  onFolderClick,
+}: QuickLinksProps) {
   return (
-    <div className="grid grid-cols-4 md:grid-cols-6 gap-5 p-10  transition-all duration-500  w-full mx-auto items-center justify-center ">
+    <div className="grid grid-cols-4 md:grid-cols-5 gap-5 p-10 w-full mx-auto items-center justify-center ">
       {links.map((app) => {
         const IconComponent = app.iconId ? ICON_MAP[app.iconId] : null;
 
@@ -28,7 +31,7 @@ const QuickLinks = memo(function QuickLinks({ links = [], onFolderClick }: Quick
             key={app.id}
             onClick={() => onFolderClick?.(app.id)}
             className={cn(
-              "group flex flex-col items-center justify-center p-6  w-full",
+              "group flex flex-col items-center justify-center p-6  size-30",
               "bg-ctp-surface0/20 backdrop-blur-md border border-ctp-surface1/40",
               "transition-all duration-500 hover:bg-ctp-surface0/40 hover:scale-110 hover:shadow-2xl hover:border-ctp-mauve/50",
             )}
@@ -57,11 +60,13 @@ const QuickLinks = memo(function QuickLinks({ links = [], onFolderClick }: Quick
                 <IconComponent className="w-full h-full" />
               ) : (
                 <img
-                  src={getFaviconUrl(app.url ?? '')}
+                  src={getFaviconUrl(app.url ?? "")}
                   alt=""
                   className="w-full h-full object-contain"
                   onError={(event) => {
-                    event.currentTarget.src = getFallbackFaviconUrl(app.url ?? '');
+                    event.currentTarget.src = getFallbackFaviconUrl(
+                      app.url ?? "",
+                    );
                   }}
                 />
               )}

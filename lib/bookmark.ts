@@ -1,6 +1,7 @@
 export interface FolderItem {
   id: string;
   title: string;
+  count?: number;
 }
 
 export interface BookmarkLink {
@@ -9,8 +10,23 @@ export interface BookmarkLink {
   url: string;
 }
 
+function countBookmarkLinks(node?: chrome.bookmarks.BookmarkTreeNode): number {
+  if (!node) {
+    return 0;
+  }
+
+  if (node.url) {
+    return 1;
+  }
+
+  return node.children?.reduce((total, child) => total + countBookmarkLinks(child), 0) ?? 0;
+}
+
 export function supportsBookmarks() {
-  return typeof chrome !== "undefined" && !!chrome.bookmarks;
+  if (typeof chrome === "undefined") {
+    return false;
+  }
+  return !!chrome.bookmarks || !!chrome.permissions;
 }
 
 export function getBookmarksBar(tree: chrome.bookmarks.BookmarkTreeNode[]) {
@@ -34,15 +50,20 @@ export function getTopLevelFolders(
 ) {
   const categories: FolderItem[] = [];
 
-  if (bookmarksBar && bookmarksBar.children && bookmarksBar.children.length > 0) {
-    categories.push({ id: bookmarksBar.id, title: "Bookmarks Bar" });
+  const bookmarksBarCount = countBookmarkLinks(bookmarksBar);
+  if (bookmarksBarCount > 0) {
+    categories.push({ id: bookmarksBar!.id, title: "Bookmarks Bar", count: bookmarksBarCount });
   }
 
-  if (otherBookmarks && otherBookmarks.children && otherBookmarks.children.length > 0) {
-    categories.push({ id: otherBookmarks.id, title: "Other Bookmarks" });
+  const otherBookmarksCount = countBookmarkLinks(otherBookmarks);
+  if (otherBookmarksCount > 0) {
+    categories.push({ id: otherBookmarks!.id, title: "Other Bookmarks", count: otherBookmarksCount });
   }
 
-  const subfolders = bookmarksBar?.children?.filter((bm) => !bm.url).map((bm) => ({ id: bm.id, title: bm.title })) ?? [];
+  const subfolders = bookmarksBar?.children
+    ?.filter((bm) => !bm.url)
+    .map((bm) => ({ id: bm.id, title: bm.title, count: countBookmarkLinks(bm) }))
+    .filter((folder) => folder.count > 0) ?? [];
 
   return [...categories, ...subfolders];
 }
