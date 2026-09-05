@@ -1,9 +1,19 @@
+<<<<<<< HEAD
 import { useState,  type FormEvent,  memo } from 'react';
 
 import type { AppConfig } from '../src/types';
 import SettingsHeader from './settings/SettingsHeader';
 import GeneralSettingsPanel from './settings/GeneralSettingsPanel';
 import QuickLinksSettingsPanel from './settings/QuickLinksSettingsPanel';
+=======
+import { useState, type FormEvent, memo } from "react";
+
+import type { AppConfig } from "../src/types";
+import SettingsHeader from "./settings/SettingsHeader";
+import GeneralSettingsPanel from "./settings/GeneralSettingsPanel";
+import QuickLinksSettingsPanel from "./settings/QuickLinksSettingsPanel";
+import About from "./settings/About";
+>>>>>>> master
 
 interface LinkItem {
   id: string;
@@ -15,11 +25,22 @@ interface SettingsProps {
   isOpen: boolean;
   onClose: () => void;
   config: AppConfig;
+<<<<<<< HEAD
   updateConfig: (key: keyof AppConfig, value: AppConfig[keyof AppConfig]) => void;
   hasPermission: {
     bookmarks: boolean;
   };
   onTogglePermission: (perm: 'bookmarks', enabled: boolean) => void;
+=======
+  updateConfig: (
+    key: keyof AppConfig,
+    value: AppConfig[keyof AppConfig],
+  ) => void;
+  hasPermission: {
+    bookmarks: boolean;
+  };
+  onTogglePermission: (perm: "bookmarks", enabled: boolean) => void;
+>>>>>>> master
   quickLinks: LinkItem[];
   onAddQuickLink: (name: string, url: string) => void;
   onRemoveQuickLink: (id: string) => void;
@@ -36,6 +57,7 @@ const Settings = memo(function Settings({
   quickLinks,
   onAddQuickLink,
   onRemoveQuickLink,
+<<<<<<< HEAD
   onUpdateQuickLink
 }: SettingsProps) {
   const [activeTab, setActiveTab] = useState<'general' | 'links' >('general');
@@ -47,12 +69,29 @@ const Settings = memo(function Settings({
 
 
 
+=======
+  onUpdateQuickLink,
+}: SettingsProps) {
+  const [activeTab, setActiveTab] = useState<"general" | "links" | "about">(
+    "general",
+  );
+  const [newLink, setNewLink] = useState({ name: "", url: "" });
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({ name: "", url: "" });
+
+  if (!isOpen) return null;
+
+>>>>>>> master
   const handleAdd = (e: FormEvent) => {
     e.preventDefault();
     if (!newLink.name || !newLink.url) return;
 
     onAddQuickLink(newLink.name, newLink.url);
+<<<<<<< HEAD
     setNewLink({ name: '', url: '' });
+=======
+    setNewLink({ name: "", url: "" });
+>>>>>>> master
   };
 
   const startEditing = (link: LinkItem) => {
@@ -68,11 +107,53 @@ const Settings = memo(function Settings({
     setEditingId(null);
   };
 
+<<<<<<< HEAD
 
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       <div
+=======
+  const renderActiveTab = () => {
+    switch (activeTab) {
+      case "general":
+        return (
+          <GeneralSettingsPanel
+            config={config}
+            hasPermission={hasPermission}
+            onToggleConfig={updateConfig}
+            onTogglePermission={onTogglePermission}
+          />
+        );
+      case "about":
+        return <About />;
+      case "links":
+        return (
+          <QuickLinksSettingsPanel
+            quickLinks={quickLinks}
+            newLink={newLink}
+            onNewLinkChange={setNewLink}
+            onAdd={handleAdd}
+            editingId={editingId}
+            editForm={editForm}
+            onEditFormChange={setEditForm}
+            onStartEditing={startEditing}
+            onUpdate={handleUpdate}
+            onCancelEditing={() => setEditingId(null)}
+            onRemoveQuickLink={onRemoveQuickLink}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
+      <button
+        type="button"
+        aria-label="Close Settings"
+>>>>>>> master
         className="absolute inset-0 bg-ctp-crust/40 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={onClose}
       />
@@ -85,6 +166,7 @@ const Settings = memo(function Settings({
         />
 
         <div className="flex-1 overflow-y-auto pr-2 space-y-6 custom-scrollbar">
+<<<<<<< HEAD
           {activeTab === 'general' ? (
             <GeneralSettingsPanel
               config={config}
@@ -115,6 +197,10 @@ const Settings = memo(function Settings({
         >
           Close Settings
         </button>
+=======
+          {renderActiveTab()}
+        </div>
+>>>>>>> master
       </div>
     </div>
   );

@@ -1,7 +1,11 @@
 import { X } from 'lucide-react';
 import { cn } from '../../lib/cn';
 
+<<<<<<< HEAD
 type Tab = 'general' | 'links'  ;
+=======
+type Tab = 'general' | 'links' | 'about'; ;
+>>>>>>> master
 
 type SettingsHeaderProps = Readonly<{
   activeTab: Tab;
@@ -12,6 +16,10 @@ type SettingsHeaderProps = Readonly<{
 const TAB_LABELS: Readonly<Record<Tab, string>> = {
   general: 'General',
   links: 'Quick Links',
+<<<<<<< HEAD
+=======
+  about: 'About',
+>>>>>>> master
 };
 
 export default function SettingsHeader({ activeTab, onTabChange, onClose }: SettingsHeaderProps) {
@@ -36,7 +44,11 @@ export default function SettingsHeader({ activeTab, onTabChange, onClose }: Sett
       </div>
       <button
         onClick={onClose}
+<<<<<<< HEAD
         className="p-2 hover:bg-ctp-surface0 transition-colors text-ctp-subtext0 hover:text-ctp-red flex-shrink-0"
+=======
+        className="p-2 hover:bg-ctp-surface0 transition-colors text-ctp-subtext0 hover:text-ctp-red shrink-0"
+>>>>>>> master
       >
         <X className="w-6 h-6" />
       </button>
