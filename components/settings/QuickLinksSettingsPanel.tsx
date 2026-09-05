@@ -1,10 +1,6 @@
-<<<<<<< HEAD
-import { Globe, Pencil, Trash2, Plus, X } from 'lucide-react';
-=======
 import { Pencil, Trash2, Plus, X } from 'lucide-react';
 import { ICON_MAP } from '../../lib/quicklinks';
 import { getFaviconUrl, getFallbackFaviconUrl } from '../../lib/favicon';
->>>>>>> master
 import type { FormEvent } from 'react';
 
 type LinkItem = {
@@ -50,22 +46,14 @@ export default function QuickLinksSettingsPanel({
             placeholder="Name"
             value={newLink.name}
             onChange={(e) => onNewLinkChange({ ...newLink, name: e.target.value })}
-<<<<<<< HEAD
-            className="flex-[2] bg-ctp-surface0/30 border border-ctp-surface1/30 px-4 py-2 text-xs text-ctp-text focus:outline-none focus:border-ctp-mauve transition-all"
-=======
             className="flex-2 bg-ctp-surface0/30 border border-ctp-surface1/30 px-4 py-2 text-xs text-ctp-text focus:outline-none focus:border-ctp-mauve transition-all"
->>>>>>> master
           />
           <input
             type="text"
             placeholder="URL (https://...)"
             value={newLink.url}
             onChange={(e) => onNewLinkChange({ ...newLink, url: e.target.value })}
-<<<<<<< HEAD
-            className="flex-[3] bg-ctp-surface0/30 border border-ctp-surface1/30 px-4 py-2 text-xs text-ctp-text focus:outline-none focus:border-ctp-mauve transition-all"
-=======
             className="flex-3 bg-ctp-surface0/30 border border-ctp-surface1/30 px-4 py-2 text-xs text-ctp-text focus:outline-none focus:border-ctp-mauve transition-all"
->>>>>>> master
           />
           <button type="submit" className="p-2 bg-ctp-mauve text-ctp-base hover:scale-105 active:scale-95 transition-all shadow-lg shadow-ctp-mauve/20">
             <Plus className="w-5 h-5" />
@@ -81,42 +69,27 @@ export default function QuickLinksSettingsPanel({
                     type="text"
                     value={editForm.name}
                     onChange={(e) => onEditFormChange({ ...editForm, name: e.target.value })}
-<<<<<<< HEAD
-                    className="flex-[2] bg-ctp-surface0/50 border border-ctp-mauve/30 px-3 py-1 text-xs text-ctp-text focus:outline-none"
-=======
                     className="flex-2 bg-ctp-surface0/50 border border-ctp-mauve/30 px-3 py-1 text-xs text-ctp-text focus:outline-none"
->>>>>>> master
                     autoFocus
                   />
                   <input
                     type="text"
                     value={editForm.url}
                     onChange={(e) => onEditFormChange({ ...editForm, url: e.target.value })}
-<<<<<<< HEAD
-                    className="flex-[3] bg-ctp-surface0/50 border border-ctp-mauve/30 px-3 py-1 text-xs text-ctp-text focus:outline-none"
-=======
                     className="flex-3 bg-ctp-surface0/50 border border-ctp-mauve/30 px-3 py-1 text-xs text-ctp-text focus:outline-none"
->>>>>>> master
                   />
                   <button type="submit" className="text-ctp-green hover:scale-110 transition-transform">
                     <Plus className="w-4 h-4" />
                   </button>
-<<<<<<< HEAD
-                  <button onClick={onCancelEditing} className="text-ctp-red hover:scale-110 transition-transform">
-=======
                   <button
                   type="button"
                   onClick={onCancelEditing} className="text-ctp-red hover:scale-110 transition-transform">
->>>>>>> master
                     <X className="w-4 h-4" />
                   </button>
                 </form>
               ) : (
                 <>
                   <div className="flex items-center space-x-3 truncate">
-<<<<<<< HEAD
-                    <Globe className="w-4 h-4 text-ctp-overlay1" />
-=======
                     {
                       (() => {
                         const key = link.name.toLowerCase();
@@ -134,7 +107,6 @@ export default function QuickLinksSettingsPanel({
                         );
                       })()
                     }
->>>>>>> master
                     <div className="truncate">
                       <p className="text-xs font-bold text-ctp-text truncate">{link.name}</p>
                       <p className="text-[10px] text-ctp-overlay1 truncate">{link.url}</p>

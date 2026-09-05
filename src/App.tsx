@@ -2,11 +2,6 @@ import { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react
 import Greeting from '../components/Greeting';
 import Navbar from '../components/Navbar';
 import Clock from '../components/Clock';
-<<<<<<< HEAD
-import Calendar from '../components/Calendar';
-import QuickLinks from '../components/QuickLinks';
-=======
->>>>>>> master
 import BookmarkManager from '../components/BookmarkManager';
 
 import Box from '../components/Box';
@@ -26,13 +21,8 @@ import {
   removeQuickLink as deleteQuickLink,
   saveQuickLinks,
   updateQuickLink as modifyQuickLink,
-<<<<<<< HEAD
-  type LinkItem,
-} from '../lib/quicklinks';
-=======
 } from '../lib/quicklinks';
   import type { LinkItem } from '../lib/quicklinks';
->>>>>>> master
 import {
   getBackgroundStyle,
   loadConfig,
@@ -51,26 +41,17 @@ export default function App() {
   const [quickLinks, setQuickLinks] = useState<LinkItem[]>(() => {
     return loadQuickLinks();
   });
-<<<<<<< HEAD
-=======
   const SAMPLE_BOOKMARK_NODES = [
     { id: 's1', title: 'MDN', url: 'https://developer.mozilla.org' },
     { id: 's2', title: 'Stack Overflow', url: 'https://stackoverflow.com' },
     { id: 's3', title: 'GitHub', url: 'https://github.com' },
     { id: 's4', title: 'News', url: 'https://news.ycombinator.com' },
   ] as unknown as chrome.bookmarks.BookmarkTreeNode[];
->>>>>>> master
   const [hasPermission, setHasPermission] = useState<PermissionState>({
     bookmarks: false,
   });
 
-<<<<<<< HEAD
-  const [config, setConfig] = useState<AppConfig>(() => {
-    return loadConfig();
-  });
-=======
   const [config, setConfig] = useState<AppConfig>(() => loadConfig());
->>>>>>> master
 
   const handlePermissionStateChange = useCallback((perm: 'bookmarks') => {
     setHasPermission((prev) => ({ ...prev, [perm]: true }));
@@ -121,10 +102,6 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-<<<<<<< HEAD
-    if (hasPermission.bookmarks && config.showBookmarks && supportsBookmarks()) {
-      fetchInitialBookmarks(setTopLevelFolders, setActiveFolderId, setBrowserBookmarks, () => {});
-=======
     if (config.showBookmarks) {
       if (hasPermission.bookmarks && supportsBookmarks()) {
         fetchInitialBookmarks(setTopLevelFolders, setActiveFolderId, setBrowserBookmarks, () => {});
@@ -136,7 +113,6 @@ export default function App() {
       setTopLevelFolders([sampleFolder]);
       setActiveFolderId(sampleFolder.id);
       setBrowserBookmarks(SAMPLE_BOOKMARK_NODES);
->>>>>>> master
     }
   }, [hasPermission, config.showBookmarks]);
 
@@ -167,20 +143,11 @@ export default function App() {
 
   const updateConfig = useCallback((key: keyof AppConfig, value: AppConfig[keyof AppConfig]) => {
     if (key === 'showBookmarks' && value === true) {
-<<<<<<< HEAD
-      if (!supportsBookmarks()) {
-        return;
-      }
-      if (!hasPermission.bookmarks) {
-        handlePermissionToggle('bookmarks', true);
-      }
-=======
       // If browser bookmark API exists, request permission when enabling.
       if (supportsBookmarks() && !hasPermission.bookmarks) {
         handlePermissionToggle('bookmarks', true);
       }
       // If bookmarks API not available, still allow enabling to show sample bookmarks.
->>>>>>> master
     }
     setConfig((prev) => updateConfigValue(prev, key, value));
   }, [hasPermission.bookmarks, handlePermissionToggle]);
@@ -206,10 +173,7 @@ export default function App() {
       <Navbar
         onSettingsClick={handleSettingsOpen}
         onHomeClick={handleHomeClick}
-<<<<<<< HEAD
-=======
         quickLinks={quickLinks}
->>>>>>> master
       />
 
       <Suspense fallback={null}>
@@ -230,19 +194,9 @@ export default function App() {
       <Box className="flex flex-col items-center justify-center p-8 relative z-10 space-y-10">
         {config.showGreeting && <Greeting />}
 
-<<<<<<< HEAD
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-12 w-full">
-          {config.showClock && <Clock />}
-          {config.showCalendar && <Calendar />}
-        </div>
-        <QuickLinks links={quickLinks} />
-
-        {config.showBookmarks && hasPermission.bookmarks && (
-=======
         {config.showClock && <Clock />}
 
         {config.showBookmarks && (hasPermission.bookmarks || topLevelFolders.length > 0) && (
->>>>>>> master
           <BookmarkManager
             bookmarkLinks={bookmarkLinks}
             folders={topLevelFolders}

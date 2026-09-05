@@ -4,14 +4,8 @@ export const DEFAULT_GRADIENT_BACKGROUND = "radial-gradient(ellipse_at_top,_var(
 
 export const DEFAULT_CONFIG: AppConfig = {
   showClock: true,
-<<<<<<< HEAD
-  showCalendar: false,
-  showGreeting: true,
-  showBookmarks: false,
-=======
   showGreeting: true,
   showBookmarks: true,
->>>>>>> master
   bgType: "gradient",
   bgValue: DEFAULT_GRADIENT_BACKGROUND,
 };
@@ -81,9 +75,6 @@ export function loadConfig() {
   const saved = localStorage.getItem("startpage-config");
   if (!saved) return DEFAULT_CONFIG;
 
-<<<<<<< HEAD
-  return { ...DEFAULT_CONFIG, ...JSON.parse(saved) } as AppConfig;
-=======
   const parsed = JSON.parse(saved) as Partial<AppConfig>;
   if (!parsed || typeof parsed !== "object") {
     return DEFAULT_CONFIG;
@@ -96,7 +87,6 @@ export function loadConfig() {
     bgType: parsed.bgType ?? DEFAULT_CONFIG.bgType,
     bgValue: parsed.bgValue ?? DEFAULT_CONFIG.bgValue,
   };
->>>>>>> master
 }
 
 export function saveConfig(config: AppConfig) {

@@ -1,13 +1,7 @@
-<<<<<<< HEAD
-import React from "react";
-import { Gmail, YouTube, GitHubDark, XDark, ClaudeAI, Gemini } from "@ridemountainpig/svgl-react";
-
-=======
 import { Gmail, YouTube, GitHubDark, XDark, ClaudeAI, Gemini } from "@ridemountainpig/svgl-react";
 
 type SvgIcon = typeof Gmail;
 
->>>>>>> master
 export interface LinkItem {
   id: string;
   name: string;
@@ -16,11 +10,7 @@ export interface LinkItem {
   iconId?: string;
 }
 
-<<<<<<< HEAD
-export const ICON_MAP: Record<string, React.FC<React.SVGProps<SVGSVGElement>>> = {
-=======
 export const ICON_MAP: Record<string, SvgIcon> = {
->>>>>>> master
   gmail: Gmail,
   youtube: YouTube,
   github: GitHubDark,

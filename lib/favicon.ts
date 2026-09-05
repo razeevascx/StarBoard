@@ -30,8 +30,6 @@ export const getFaviconUrl = (url: string, size = 32) => {
     return getFallbackFaviconUrl(url, size); // now safe to call
   }
 };
-<<<<<<< HEAD
-=======
 
 // Try higher-quality logo sources first, then fallback to Google S2 favicons.
 export const getBestFaviconUrl = (url: string, size = 128) => {
@@ -42,4 +40,3 @@ export const getBestFaviconUrl = (url: string, size = 128) => {
     return getFallbackFaviconUrl(url, size);
   }
 };
->>>>>>> master
