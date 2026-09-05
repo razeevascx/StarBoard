@@ -46,14 +46,14 @@ export default function QuickLinksSettingsPanel({
             placeholder="Name"
             value={newLink.name}
             onChange={(e) => onNewLinkChange({ ...newLink, name: e.target.value })}
-            className="flex-[2] bg-ctp-surface0/30 border border-ctp-surface1/30 px-4 py-2 text-xs text-ctp-text focus:outline-none focus:border-ctp-mauve transition-all"
+            className="flex-2 bg-ctp-surface0/30 border border-ctp-surface1/30 px-4 py-2 text-xs text-ctp-text focus:outline-none focus:border-ctp-mauve transition-all"
           />
           <input
             type="text"
             placeholder="URL (https://...)"
             value={newLink.url}
             onChange={(e) => onNewLinkChange({ ...newLink, url: e.target.value })}
-            className="flex-[3] bg-ctp-surface0/30 border border-ctp-surface1/30 px-4 py-2 text-xs text-ctp-text focus:outline-none focus:border-ctp-mauve transition-all"
+            className="flex-3 bg-ctp-surface0/30 border border-ctp-surface1/30 px-4 py-2 text-xs text-ctp-text focus:outline-none focus:border-ctp-mauve transition-all"
           />
           <button type="submit" className="p-2 bg-ctp-mauve text-ctp-base hover:scale-105 active:scale-95 transition-all shadow-lg shadow-ctp-mauve/20">
             <Plus className="w-5 h-5" />
@@ -69,7 +69,7 @@ export default function QuickLinksSettingsPanel({
                     type="text"
                     value={editForm.name}
                     onChange={(e) => onEditFormChange({ ...editForm, name: e.target.value })}
-                    className="flex-[2] bg-ctp-surface0/50 border border-ctp-mauve/30 px-3 py-1 text-xs text-ctp-text focus:outline-none"
+                    className="flex-2 bg-ctp-surface0/50 border border-ctp-mauve/30 px-3 py-1 text-xs text-ctp-text focus:outline-none"
                     autoFocus
                   />
                   <input
@@ -81,7 +81,9 @@ export default function QuickLinksSettingsPanel({
                   <button type="submit" className="text-ctp-green hover:scale-110 transition-transform">
                     <Plus className="w-4 h-4" />
                   </button>
-                  <button onClick={onCancelEditing} className="text-ctp-red hover:scale-110 transition-transform">
+                  <button
+                  type="button"
+                  onClick={onCancelEditing} className="text-ctp-red hover:scale-110 transition-transform">
                     <X className="w-4 h-4" />
                   </button>
                 </form>

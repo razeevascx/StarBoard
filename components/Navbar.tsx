@@ -49,7 +49,6 @@ const Navbar = memo(function Navbar({
               <a
                 key={link.id}
                 href={link.url}
-                target="_blank"
                 rel="noreferrer noopener"
                 className={cn(
                   "flex items-center space-x-2 px-2 py-1 rounded transition-colors text-ctp-subtext0 hover:text-ctp-mauve hover:bg-ctp-surface0/10",

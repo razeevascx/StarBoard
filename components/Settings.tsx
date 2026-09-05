@@ -1,9 +1,10 @@
-import { useState,  type FormEvent,  memo } from 'react';
+import { useState, type FormEvent, memo } from "react";
 
-import type { AppConfig } from '../src/types';
-import SettingsHeader from './settings/SettingsHeader';
-import GeneralSettingsPanel from './settings/GeneralSettingsPanel';
-import QuickLinksSettingsPanel from './settings/QuickLinksSettingsPanel';
+import type { AppConfig } from "../src/types";
+import SettingsHeader from "./settings/SettingsHeader";
+import GeneralSettingsPanel from "./settings/GeneralSettingsPanel";
+import QuickLinksSettingsPanel from "./settings/QuickLinksSettingsPanel";
+import About from "./settings/About";
 
 interface LinkItem {
   id: string;
@@ -15,11 +16,14 @@ interface SettingsProps {
   isOpen: boolean;
   onClose: () => void;
   config: AppConfig;
-  updateConfig: (key: keyof AppConfig, value: AppConfig[keyof AppConfig]) => void;
+  updateConfig: (
+    key: keyof AppConfig,
+    value: AppConfig[keyof AppConfig],
+  ) => void;
   hasPermission: {
     bookmarks: boolean;
   };
-  onTogglePermission: (perm: 'bookmarks', enabled: boolean) => void;
+  onTogglePermission: (perm: "bookmarks", enabled: boolean) => void;
   quickLinks: LinkItem[];
   onAddQuickLink: (name: string, url: string) => void;
   onRemoveQuickLink: (id: string) => void;
@@ -36,23 +40,23 @@ const Settings = memo(function Settings({
   quickLinks,
   onAddQuickLink,
   onRemoveQuickLink,
-  onUpdateQuickLink
+  onUpdateQuickLink,
 }: SettingsProps) {
-  const [activeTab, setActiveTab] = useState<'general' | 'links' >('general');
-  const [newLink, setNewLink] = useState({ name: '', url: '' });
+  const [activeTab, setActiveTab] = useState<"general" | "links" | "about">(
+    "general",
+  );
+  const [newLink, setNewLink] = useState({ name: "", url: "" });
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ name: '', url: '' });
+  const [editForm, setEditForm] = useState({ name: "", url: "" });
 
   if (!isOpen) return null;
-
-
 
   const handleAdd = (e: FormEvent) => {
     e.preventDefault();
     if (!newLink.name || !newLink.url) return;
 
     onAddQuickLink(newLink.name, newLink.url);
-    setNewLink({ name: '', url: '' });
+    setNewLink({ name: "", url: "" });
   };
 
   const startEditing = (link: LinkItem) => {
@@ -68,11 +72,45 @@ const Settings = memo(function Settings({
     setEditingId(null);
   };
 
-
+  const renderActiveTab = () => {
+    switch (activeTab) {
+      case "general":
+        return (
+          <GeneralSettingsPanel
+            config={config}
+            hasPermission={hasPermission}
+            onToggleConfig={updateConfig}
+            onTogglePermission={onTogglePermission}
+          />
+        );
+      case "about":
+        return <About />;
+      case "links":
+        return (
+          <QuickLinksSettingsPanel
+            quickLinks={quickLinks}
+            newLink={newLink}
+            onNewLinkChange={setNewLink}
+            onAdd={handleAdd}
+            editingId={editingId}
+            editForm={editForm}
+            onEditFormChange={setEditForm}
+            onStartEditing={startEditing}
+            onUpdate={handleUpdate}
+            onCancelEditing={() => setEditingId(null)}
+            onRemoveQuickLink={onRemoveQuickLink}
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
-      <div
+      <button
+        type="button"
+        aria-label="Close Settings"
         className="absolute inset-0 bg-ctp-crust/40 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={onClose}
       />
@@ -85,36 +123,8 @@ const Settings = memo(function Settings({
         />
 
         <div className="flex-1 overflow-y-auto pr-2 space-y-6 custom-scrollbar">
-          {activeTab === 'general' ? (
-            <GeneralSettingsPanel
-              config={config}
-              hasPermission={hasPermission}
-              onToggleConfig={updateConfig}
-              onTogglePermission={onTogglePermission}
-            />
-          ): (
-            <QuickLinksSettingsPanel
-              quickLinks={quickLinks}
-              newLink={newLink}
-              onNewLinkChange={setNewLink}
-              onAdd={handleAdd}
-              editingId={editingId}
-              editForm={editForm}
-              onEditFormChange={setEditForm}
-              onStartEditing={startEditing}
-              onUpdate={handleUpdate}
-              onCancelEditing={() => setEditingId(null)}
-              onRemoveQuickLink={onRemoveQuickLink}
-            />
-          )}
+          {renderActiveTab()}
         </div>
-
-        <button
-          onClick={onClose}
-          className="w-full mt-8 py-4 bg-ctp-mauve text-ctp-base font-black uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-ctp-mauve/20"
-        >
-          Close Settings
-        </button>
       </div>
     </div>
   );
