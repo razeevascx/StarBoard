@@ -1,4 +1,5 @@
-import { Settings} from 'lucide-react';
+import { GitHubDark } from '@ridemountainpig/svgl-react';
+import { Settings } from 'lucide-react';
 import { cn } from '../lib/cn';
 import { memo } from 'react';
 import Box from './Box';
@@ -30,15 +31,13 @@ const Navbar = memo(function Navbar({
         <div className="flex items-center space-x-6 group cursor-default max-w-[85%] overflow-x-auto custom-scrollbar">
           <button
             onClick={onHomeClick}
-            className="flex items-center space-x-3 group/brand transition-all hover:opacity-80 shrink-0"
+            className="flex items-center space-x-3 size-10 group/brand transition-all hover:opacity-80 shrink-0"
           >
-            <div className="size-10 p-1.5  bg-ctp-mauve/20 border border-ctp-mauve/30 text-ctp-mauve group-hover/brand:bg-ctp-mauve group-hover/brand:text-ctp-base transition-all duration-500">
               <img
                 src="favicon.svg"
-                alt="start page logo"
+                alt="Starboard logo"
                 className="w-full h-full"
               />
-            </div>
           </button>
         </div>
 
@@ -77,10 +76,21 @@ const Navbar = memo(function Navbar({
               </a>
             );
           })}
+          <a
+            href="https://github.com"
+            target="_blank"
+            rel="noreferrer noopener"
+            className="text-ctp-subtext0 hover:text-ctp-mauve transition-colors duration-300"
+            title="GitHub"
+            aria-label="Open GitHub"
+          >
+            <GitHubDark className="w-6 h-6 fill-current" />
+          </a>
           <button
             onClick={onSettingsClick}
             className="text-ctp-subtext0 hover:text-ctp-blue transition-colors duration-300"
             title="Settings"
+            aria-label="Open settings"
           >
             <Settings className="w-6 h-6" />
           </button>

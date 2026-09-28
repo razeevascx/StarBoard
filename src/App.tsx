@@ -167,6 +167,7 @@ export default function App() {
         "min-h-screen text-ctp-text selection:bg-ctp-mauve/30 overflow-x-hidden pt-16 transition-all duration-700",
         config.bgType === "gradient" &&
           "from-ctp-mantle via-ctp-base to-ctp-base",
+        config.folderNavigation === "sidebar" && "pl-44 md:pl-56",
       )}
       style={backgroundStyle}
     >
@@ -202,6 +203,9 @@ export default function App() {
             folders={topLevelFolders}
             activeFolderId={activeFolderId}
             onFolderSelect={handleFolderSelect}
+            layout={config.bookmarkLayout}
+            columns={config.bookmarkColumns}
+            folderNavigation={config.folderNavigation}
           />
         )}
       </Box>

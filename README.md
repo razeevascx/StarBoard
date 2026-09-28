@@ -1,6 +1,6 @@
 <div align="center">
 
-# NEW TAB
+# Starboard
 
 *A minimalist Chrome start page that turns every new tab into a calm, customizable command center.*
 
@@ -24,7 +24,7 @@
 
 ## Overview
 
-New Tab replaces the default Chrome new-tab page with a focused dashboard built for fast access and low distraction. It is designed for people who want a cleaner start page that still surfaces the essentials: search, time, bookmarks, quick links, and a personalized background.
+Starboard replaces the default Chrome new-tab page with a focused dashboard built for fast access and low distraction. It surfaces the essentials: time, bookmarks, quick links, and a personalized background.
 
 The app stores preferences locally and lets you opt into browser permissions only when you want bookmarks exposed. That keeps the experience lightweight while still supporting a more integrated start page when needed.
 
@@ -48,7 +48,7 @@ The app stores preferences locally and lets you opt into browser permissions onl
 
 - **`bun run dev`** — Start the Vite dev server for local iteration.
 - **`bun run build`** — Type-check the project and build the extension into `dist/`.
-- **`bun run package`** — Build the extension and create `new-tab-extension.zip`.
+- **`bun run package`** — Build the extension and create `starboard-extension.zip`.
 - **`bun run preview`** — Preview the built app locally with Vite.
 - **`bun run lint`** — Run ESLint across the codebase.
 

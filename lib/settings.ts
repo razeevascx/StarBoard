@@ -6,6 +6,9 @@ export const DEFAULT_CONFIG: AppConfig = {
   showClock: true,
   showGreeting: true,
   showBookmarks: true,
+  bookmarkLayout: "cards",
+  bookmarkColumns: 4,
+  folderNavigation: "bottom",
   bgType: "gradient",
   bgValue: DEFAULT_GRADIENT_BACKGROUND,
 };
@@ -71,7 +74,7 @@ export function applyGradientBackground(updateConfig: UpdateConfig) {
   updateConfig("bgValue", DEFAULT_GRADIENT_BACKGROUND);
 }
 
-export function loadConfig() {
+export function loadConfig(): AppConfig {
   const saved = localStorage.getItem("startpage-config");
   if (!saved) return DEFAULT_CONFIG;
 
@@ -84,6 +87,12 @@ export function loadConfig() {
     showClock: parsed.showClock ?? DEFAULT_CONFIG.showClock,
     showGreeting: parsed.showGreeting ?? DEFAULT_CONFIG.showGreeting,
     showBookmarks: parsed.showBookmarks ?? DEFAULT_CONFIG.showBookmarks,
+    bookmarkLayout: parsed.bookmarkLayout === "list" ? "list" : "cards",
+    bookmarkColumns:
+      parsed.bookmarkColumns === 2 || parsed.bookmarkColumns === 3 || parsed.bookmarkColumns === 4
+        ? parsed.bookmarkColumns
+        : DEFAULT_CONFIG.bookmarkColumns,
+    folderNavigation: parsed.folderNavigation === "sidebar" ? "sidebar" : "bottom",
     bgType: parsed.bgType ?? DEFAULT_CONFIG.bgType,
     bgValue: parsed.bgValue ?? DEFAULT_CONFIG.bgValue,
   };

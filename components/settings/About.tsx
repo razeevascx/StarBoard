@@ -51,12 +51,11 @@ export default function About() {
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
       <section>
         <h2 className="text-3xl md:text-4xl font-extrabold text-ctp-text tracking-tight font-sans">
-          Startpage
+          Starboard
         </h2>
 
         <p className="text-xs text-ctp-subtext0 leading-relaxed mt-2">
-          A minimalist Chrome start page that turns every new tab into a calm,
-          customizable command center.
+          A calm, customizable command center for your browser.
         </p>
       </section>
 
