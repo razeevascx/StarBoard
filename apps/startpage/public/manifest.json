@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Starboard",
+  "version": "1.0.0",
+  "description": "A calm, customizable command center for your browser.",
+  "permissions": ["storage", "cookies", "favicons", "unlimitedStorage"],
+  "optional_permissions": ["bookmarks"],
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "action": {
+    "default_title": "Open Starboard",
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "favicon.svg",
+    "32": "favicon.svg",
+    "48": "favicon.svg",
+    "128": "favicon.svg"
+  }
+}

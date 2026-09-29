@@ -22,6 +22,8 @@ _A calmer new-tab dashboard for the links, bookmarks, and time you use every day
 
 Starboard is a focused browser start page that brings your clock, greeting, search, quick links, and bookmarks into one quiet dashboard. The Chrome extension replaces the new-tab page, while the companion Next.js app provides an authenticated bookmark library with collections and trash management.
 
+Both apps live in this repository; no submodule or second clone is needed.
+
 It is built for people who want their most-used links close at hand without turning every new tab into a noisy feed. Local settings keep the start page fast, and optional Clerk and Neon integration makes bookmark sync available when you need it.
 
 ## Features
@@ -109,7 +111,7 @@ The extension uses local browser storage for settings and can access real bookma
 1. **Build the extension**
 
    ```bash
-   bun --cwd apps/startpage run build
+   bun run --filter starboard-extension build
    ```
 
 2. **Open Chrome extensions**

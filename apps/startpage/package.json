@@ -1,0 +1,54 @@
+{
+  "name": "starboard-extension",
+  "private": true,
+  "version": "0.0.0",
+  "description": "A calm, customizable command center for your browser.",
+  "homepage": "https://github.com/razeevascx/StarBoard/tree/main/apps/startpage",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/razeevascx/StarBoard.git",
+    "directory": "apps/startpage"
+  },
+  "bugs": {
+    "url": "https://github.com/razeevascx/StarBoard/issues"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "build:extension": "bun run build",
+    "package": "bun run build && zip -r starboard-extension.zip dist",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@clerk/chrome-extension": "^3.1.87",
+    "@ridemountainpig/svgl-react": "^1.0.18",
+    "@tailwindcss/vite": "^4.3.3",
+    "cn": "^0.2.6",
+    "lucide-react": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "tailwindcss": "catalog:"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "@catppuccin/tailwindcss": "^1.0.0",
+    "@eslint/js": "^10.0.1",
+    "@rolldown/plugin-babel": "^0.2.4",
+    "@types/babel__core": "^7.20.5",
+    "@types/chrome": "^0.1.43",
+    "@types/node": "^24.19.0",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "^6.1.1",
+    "babel-plugin-react-compiler": "^1.0.0",
+    "eslint": "^10.11.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "globals": "^17.12.0",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.71.0",
+    "vite": "^8.3.1"
+  }
+}

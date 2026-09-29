@@ -1,0 +1,31 @@
+const normalizeUrl = (url: string) =>
+  new URL(url.startsWith("http") ? url : `https://${url}`);
+
+// Defined BEFORE getFaviconUrl so the const reference is valid
+export const getFallbackFaviconUrl = (url: string, size = 32) => {
+  try {
+    const urlObj = normalizeUrl(url); // reuse shared helper
+    return `https://www.google.com/s2/favicons?domain=${urlObj.hostname}&sz=${size}`;
+  } catch {
+    return `https://www.google.com/s2/favicons?domain=google.com&sz=${size}`;
+  }
+};
+
+export const getFaviconUrl = (url: string, size = 32) => {
+  try {
+    const urlObj = normalizeUrl(url);
+    return `https://www.google.com/s2/favicons?domain=${urlObj.hostname}&sz=${size}`;
+  } catch {
+    return getFallbackFaviconUrl(url, size); // now safe to call
+  }
+};
+
+// Try higher-quality logo sources first, then fallback to Google S2 favicons.
+export const getBestFaviconUrl = (url: string, size = 128) => {
+  try {
+    // Prefer the Google S2 favicon service as the primary source.
+    return getFaviconUrl(url, size);
+  } catch {
+    return getFallbackFaviconUrl(url, size);
+  }
+};
