@@ -4,29 +4,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Brand } from "@/components/Brand";
 import { UserMenu } from "@/components/UserMenu";
+import { collectionColor } from "@/lib/collection-colors";
+import type { Collection } from "@/lib/library";
 
 const menuSections = [
   {
     label: "Main Menu",
     items: [
       { label: "Bookmarks", href: "/dashboard/bookmarks", icon: "M6 4h12v17l-6-4-6 4V4Z" },
-    ],
-  },
-  {
-    label: "Folders",
-    items: [
       { label: "Collections", href: "/dashboard/collections", icon: "M3 7V4h6l2 3h10v13H3V7Z" },
-    ],
-  },
-  {
-    label: "Tools",
-    items: [
-      { label: "Trash", href: "/dashboard/trash", icon: "M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" },
     ],
   },
 ];
 
-export function DashboardSidebar() {
+export function DashboardSidebar({ collections }: { collections: Collection[] }) {
   const pathname = usePathname();
 
   return (
@@ -47,7 +38,7 @@ export function DashboardSidebar() {
                     key={href}
                     href={href}
                     aria-current={isActive ? "page" : undefined}
-                    className={`flex min-h-11 min-w-0 items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors ${isActive ? "bg-ctp-mauve/15 text-ctp-mauve" : "text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text"}`}
+                    className={`flex min-h-11 min-w-0 items-center gap-3 px-3 py-3 text-sm font-medium transition-colors ${isActive ? "bg-ctp-mauve/15 text-ctp-mauve" : "text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text"}`}
                   >
                     <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
                       <path d={icon} />
@@ -59,9 +50,31 @@ export function DashboardSidebar() {
             </div>
           </div>
         ))}
+        <div>
+          <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-[0.16em] text-ctp-overlay0">Folders</p>
+          <div className="space-y-1">
+            {collections.map((collection) => {
+              const href = `/dashboard/collections/${collection.id}`;
+              const active = pathname === href;
+              const color = collectionColor(collection.id, collection.color);
+              return <Link key={collection.id} href={href} aria-current={active ? "page" : undefined} className={`flex min-h-10 min-w-0 items-center gap-3 px-3 py-2 text-sm transition-colors ${active ? "bg-ctp-surface0 text-ctp-text" : "text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text"}`}>
+                <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7V4h6l2 3h10v13H3V7Z" /></svg>
+                <span className="truncate">{collection.name}</span>
+              </Link>;
+            })}
+            {!collections.length && <p className="px-3 text-xs text-ctp-overlay0">No folders yet</p>}
+          </div>
+        </div>
+        <div>
+          <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-[0.16em] text-ctp-overlay0">Tools</p>
+          <Link href="/dashboard/trash" aria-current={pathname === "/dashboard/trash" ? "page" : undefined} className={`flex min-h-11 items-center gap-3 px-3 py-3 text-sm font-medium transition-colors ${pathname === "/dashboard/trash" ? "bg-ctp-mauve/15 text-ctp-mauve" : "text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text"}`}>
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" /></svg>
+            Trash
+          </Link>
+        </div>
       </nav>
       <div className="mt-auto shrink-0 px-4 pb-3">
-        <Link href="/#faq" className="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-ctp-subtext1 transition-colors hover:bg-ctp-surface0/50 hover:text-ctp-text">
+        <Link href="/#faq" className="flex min-h-11 items-center gap-3 px-3 py-3 text-sm font-medium text-ctp-subtext1 transition-colors hover:bg-ctp-surface0/50 hover:text-ctp-text">
           <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="9" />
             <path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 3.5M12 16h.01" />

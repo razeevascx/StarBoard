@@ -1,6 +1,7 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -12,10 +13,27 @@ const geistMono = localFont({
   variable: "--font-geist-mono",
 });
 
+const siteUrl = getSiteUrl();
+const description = "A calm, customizable browser start page for bookmarks, quick links, and everything you need in a new tab.";
+
 export const metadata: Metadata = {
-  title: "Starboard",
-  description:
-    "A calm, customizable command center for your browser.",
+  metadataBase: siteUrl ?? undefined,
+  title: "Starboard — Your calm browser start page",
+  description,
+  applicationName: "Starboard",
+  openGraph: {
+    type: "website",
+    siteName: "Starboard",
+    title: "Starboard — Your calm browser start page",
+    description,
+    url: siteUrl?.href,
+    locale: "en_GB",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Starboard — Your calm browser start page",
+    description,
+  },
 };
 
 export default function RootLayout({
@@ -38,7 +56,6 @@ export default function RootLayout({
               colorMutedForeground: "#a6adc8",
               colorInput: "#1e1e2e",
               colorInputForeground: "#cdd6f4",
-              borderRadius: "0.75rem",
               fontFamily: "var(--font-geist-sans), sans-serif",
             },
           }}
