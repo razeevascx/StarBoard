@@ -1,10 +1,11 @@
 import { useState, type FormEvent, memo } from "react";
 
 import type { AppConfig } from "../src/types";
-import SettingsHeader from "./settings/SettingsHeader";
+import SettingsHeader, { type Tab } from "./settings/SettingsHeader";
 import GeneralSettingsPanel from "./settings/GeneralSettingsPanel";
 import QuickLinksSettingsPanel from "./settings/QuickLinksSettingsPanel";
 import About from "./settings/About";
+import AccountSync from "./AccountSync";
 
 interface LinkItem {
   id: string;
@@ -42,14 +43,12 @@ const Settings = memo(function Settings({
   onRemoveQuickLink,
   onUpdateQuickLink,
 }: SettingsProps) {
-  const [activeTab, setActiveTab] = useState<"general" | "links" | "about">(
-    "general",
+  const [activeTab, setActiveTab] = useState<Tab>(
+    () => new URLSearchParams(window.location.search).get('settings') === 'account' ? 'account' : 'general',
   );
   const [newLink, setNewLink] = useState({ name: "", url: "" });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ name: "", url: "" });
-
-  if (!isOpen) return null;
 
   const handleAdd = (e: FormEvent) => {
     e.preventDefault();
@@ -107,7 +106,7 @@ const Settings = memo(function Settings({
   };
 
   return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
+    <div className={isOpen ? "fixed inset-0 z-100 flex items-center justify-center p-4" : "hidden"}>
       <button
         type="button"
         aria-label="Close Settings"
@@ -124,6 +123,13 @@ const Settings = memo(function Settings({
 
         <div className="flex-1 overflow-y-auto pr-2 space-y-6 custom-scrollbar">
           {renderActiveTab()}
+          <div className={activeTab === "account" ? "" : "hidden"}>
+            {import.meta.env.VITE_CLERK_PUBLISHABLE_KEY && typeof chrome !== "undefined" && chrome.runtime?.id ? (
+              <AccountSync />
+            ) : (
+              <p className="text-sm text-ctp-subtext0">Account sign-in is available in the installed extension after its Clerk publishable key is configured.</p>
+            )}
+          </div>
         </div>
       </div>
     </div>

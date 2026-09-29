@@ -34,7 +34,7 @@ import type { AppConfig } from './types';
 const Settings = lazy(() => import('../components/Settings'));
 
 export default function App() {
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(() => new URLSearchParams(window.location.search).get('settings') === 'account');
   const [browserBookmarks, setBrowserBookmarks] = useState<chrome.bookmarks.BookmarkTreeNode[]>([]);
   const [topLevelFolders, setTopLevelFolders] = useState<FolderItem[]>([]);
   const [activeFolderId, setActiveFolderId] = useState<string | null>(null);

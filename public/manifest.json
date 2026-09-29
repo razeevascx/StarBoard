@@ -3,7 +3,7 @@
   "name": "Starboard",
   "version": "1.0.0",
   "description": "A calm, customizable command center for your browser.",
-  "permissions": ["storage", "favicons", "unlimitedStorage"],
+  "permissions": ["storage", "cookies", "favicons", "unlimitedStorage"],
   "optional_permissions": ["bookmarks"],
   "chrome_url_overrides": {
     "newtab": "index.html"
