@@ -10,9 +10,13 @@ import { readFileSync, writeFileSync } from 'node:fs'
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, import.meta.dirname, 'VITE_')
   const webEnv = loadEnv(mode, resolve(import.meta.dirname, '../web'), 'NEXT_PUBLIC_')
-  const webUrl = env.VITE_WEB_URL || 'http://localhost:3000'
+  const vercelHost = process.env.VERCEL_ENV === 'production'
+    ? process.env.VERCEL_PROJECT_PRODUCTION_URL
+    : process.env.VERCEL_URL
+  const webUrl = process.env.VITE_WEB_URL || env.VITE_WEB_URL || (vercelHost ? `https://${vercelHost}` : 'http://localhost:3000')
   const hosts = new Set([`${new URL(webUrl).origin}/*`])
-  const key = env.VITE_CLERK_PUBLISHABLE_KEY || webEnv.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+  const key = process.env.VITE_CLERK_PUBLISHABLE_KEY || env.VITE_CLERK_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || webEnv.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
   if (key) {
     const encoded = key.replace(/^pk_(test|live)_/, '')
     const frontendHost = Buffer.from(encoded, 'base64').toString('utf8').replace(/\$$/, '')
@@ -23,6 +27,7 @@ export default defineConfig(({ mode }) => {
   base: "./",
   define: {
     'import.meta.env.VITE_CLERK_PUBLISHABLE_KEY': JSON.stringify(key || ''),
+    'import.meta.env.VITE_WEB_URL': JSON.stringify(webUrl),
   },
   plugins: [
     react(),
@@ -36,7 +41,8 @@ export default defineConfig(({ mode }) => {
         const target = resolve(import.meta.dirname, 'dist/manifest.json')
         const manifest = JSON.parse(readFileSync(source, 'utf8'))
         manifest.host_permissions = [...hosts]
-        if (env.VITE_EXTENSION_PUBLIC_KEY) manifest.key = env.VITE_EXTENSION_PUBLIC_KEY
+        const extensionKey = process.env.VITE_EXTENSION_PUBLIC_KEY || env.VITE_EXTENSION_PUBLIC_KEY
+        if (extensionKey) manifest.key = extensionKey
         writeFileSync(target, JSON.stringify(manifest, null, 2) + '\n')
       },
     },
