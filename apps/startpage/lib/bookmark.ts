@@ -1,3 +1,5 @@
+import { extensionApi, supportsBookmarkAccess } from "./browser";
+
 export interface FolderItem {
   id: string;
   title: string;
@@ -19,63 +21,101 @@ function countBookmarkLinks(node?: chrome.bookmarks.BookmarkTreeNode): number {
     return 1;
   }
 
-  return node.children?.reduce((total, child) => total + countBookmarkLinks(child), 0) ?? 0;
+  return (
+    node.children?.reduce(
+      (total, child) => total + countBookmarkLinks(child),
+      0,
+    ) ?? 0
+  );
 }
 
 export function supportsBookmarks() {
-  if (typeof chrome === "undefined") {
-    return false;
-  }
-  return !!chrome.bookmarks || !!chrome.permissions;
+  return supportsBookmarkAccess();
 }
 
 export function getBookmarksBar(tree: chrome.bookmarks.BookmarkTreeNode[]) {
-  return tree[0]?.children?.find((child) =>
-    child.id === "1" ||
-    child.title.toLowerCase().includes("bar") ||
-    child.title.toLowerCase().includes("bookmarks"),
+  const folders = tree[0]?.children ?? [];
+  return (
+    folders.find((child) => child.id === "1" || child.id === "toolbar_____") ??
+    folders.find((child) => /bar|toolbar/i.test(child.title))
   );
 }
 
 export function getOtherBookmarks(tree: chrome.bookmarks.BookmarkTreeNode[]) {
-  return tree[0]?.children?.find((child) =>
-    child.id === "2" ||
-    child.title.toLowerCase().includes("other")
+  const folders = tree[0]?.children ?? [];
+  return (
+    folders.find((child) => child.id === "2" || child.id === "unfiled_____") ??
+    folders.find((child) => /other|unfiled/i.test(child.title))
   );
 }
 
 export function getTopLevelFolders(
   bookmarksBar?: chrome.bookmarks.BookmarkTreeNode,
-  otherBookmarks?: chrome.bookmarks.BookmarkTreeNode
+  otherBookmarks?: chrome.bookmarks.BookmarkTreeNode,
+  rootFolders: chrome.bookmarks.BookmarkTreeNode[] = [],
 ) {
   const categories: FolderItem[] = [];
 
   const bookmarksBarCount = countBookmarkLinks(bookmarksBar);
   if (bookmarksBarCount > 0) {
-    categories.push({ id: bookmarksBar!.id, title: "Bookmarks Bar", count: bookmarksBarCount });
+    categories.push({
+      id: bookmarksBar!.id,
+      title: bookmarksBar!.title || "Bookmarks Bar",
+      count: bookmarksBarCount,
+    });
   }
 
   const otherBookmarksCount = countBookmarkLinks(otherBookmarks);
   if (otherBookmarksCount > 0) {
-    categories.push({ id: otherBookmarks!.id, title: "Other Bookmarks", count: otherBookmarksCount });
+    categories.push({
+      id: otherBookmarks!.id,
+      title: otherBookmarks!.title || "Other Bookmarks",
+      count: otherBookmarksCount,
+    });
   }
 
-  const subfolders = bookmarksBar?.children
-    ?.filter((bm) => !bm.url)
-    .map((bm) => ({ id: bm.id, title: bm.title, count: countBookmarkLinks(bm) }))
-    .filter((folder) => folder.count > 0) ?? [];
+  for (const folder of rootFolders) {
+    const count = countBookmarkLinks(folder);
+    if (
+      !folder.url &&
+      folder.id !== bookmarksBar?.id &&
+      folder.id !== otherBookmarks?.id &&
+      count > 0
+    ) {
+      categories.push({ id: folder.id, title: folder.title, count });
+    }
+  }
+
+  const subfolders =
+    bookmarksBar?.children
+      ?.filter((bm) => !bm.url)
+      .map((bm) => ({
+        id: bm.id,
+        title: bm.title,
+        count: countBookmarkLinks(bm),
+      }))
+      .filter((folder) => folder.count > 0) ?? [];
 
   return [...categories, ...subfolders];
 }
 
-export function getInitialFolderId(folders: FolderItem[], bookmarksBar?: chrome.bookmarks.BookmarkTreeNode) {
-  return folders.length > 0 ? folders[0].id : (bookmarksBar?.id || "1");
+export function getInitialFolderId(
+  folders: FolderItem[],
+  bookmarksBar?: chrome.bookmarks.BookmarkTreeNode,
+) {
+  return folders.length > 0 ? folders[0].id : bookmarksBar?.id || "1";
 }
 
-export function toBookmarkLinks(bookmarks: chrome.bookmarks.BookmarkTreeNode[]): BookmarkLink[] {
+export function toBookmarkLinks(
+  bookmarks: chrome.bookmarks.BookmarkTreeNode[],
+): BookmarkLink[] {
   return bookmarks
     .filter((bookmark) => bookmark.url)
-    .map((bookmark) => ({ id: bookmark.id, name: bookmark.title, url: bookmark.url as string }));
+    .map((bookmark) => ({
+      id: bookmark.id,
+      name: bookmark.title,
+      url: bookmark.url as string,
+    }));
 }
 
 export function fetchFolderContents(
@@ -83,18 +123,21 @@ export function fetchFolderContents(
   setBrowserBookmarks: (bookmarks: chrome.bookmarks.BookmarkTreeNode[]) => void,
   onError?: (error: string) => void,
 ) {
-  if (!supportsBookmarks()) {
+  if (!extensionApi?.bookmarks?.getChildren) {
     onError?.("Bookmarks are not supported.");
     return;
   }
 
-  chrome.bookmarks.getChildren(folderId, (children) => {
-    if (chrome.runtime.lastError) {
-      onError?.(chrome.runtime.lastError.message || "Failed to fetch bookmarks.");
-      return;
-    }
-    setBrowserBookmarks(children);
-  });
+  void extensionApi!.bookmarks
+    .getChildren(folderId)
+    .then((children) => {
+      setBrowserBookmarks(children);
+    })
+    .catch((error: unknown) =>
+      onError?.(
+        error instanceof Error ? error.message : "Failed to fetch bookmarks.",
+      ),
+    );
 }
 
 export function selectBookmarkFolder(
@@ -113,24 +156,34 @@ export function fetchInitialBookmarks(
   setBrowserBookmarks: (bookmarks: chrome.bookmarks.BookmarkTreeNode[]) => void,
   onError?: (error: string) => void,
 ) {
-  if (!supportsBookmarks()) {
+  if (!extensionApi?.bookmarks?.getTree) {
     onError?.("Bookmarks are not supported.");
     return;
   }
 
-  chrome.bookmarks.getTree((tree) => {
-    if (chrome.runtime.lastError) {
-      onError?.(chrome.runtime.lastError.message || "Failed to fetch bookmarks.");
-      return;
-    }
+  void extensionApi!.bookmarks
+    .getTree()
+    .then((tree) => {
+      const bookmarksBar = getBookmarksBar(tree);
+      const otherBookmarks = getOtherBookmarks(tree);
+      const folders = getTopLevelFolders(
+        bookmarksBar,
+        otherBookmarks,
+        tree[0]?.children,
+      );
+      setTopLevelFolders(folders);
 
-    const bookmarksBar = getBookmarksBar(tree);
-    const otherBookmarks = getOtherBookmarks(tree);
-    const folders = getTopLevelFolders(bookmarksBar, otherBookmarks);
-    setTopLevelFolders(folders);
-
-    const initialFolder = getInitialFolderId(folders, bookmarksBar);
-    setActiveFolderId(initialFolder);
-    fetchFolderContents(initialFolder, setBrowserBookmarks, onError);
-  });
+      const initialFolder = getInitialFolderId(folders, bookmarksBar);
+      setActiveFolderId(initialFolder);
+      if (folders.length === 0 && !bookmarksBar) {
+        setBrowserBookmarks([]);
+        return;
+      }
+      fetchFolderContents(initialFolder, setBrowserBookmarks, onError);
+    })
+    .catch((error: unknown) =>
+      onError?.(
+        error instanceof Error ? error.message : "Failed to fetch bookmarks.",
+      ),
+    );
 }

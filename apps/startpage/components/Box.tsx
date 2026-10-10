@@ -8,7 +8,7 @@ type BoxProps = Readonly<{
 
 const Box = memo(function Box({ className, children }: BoxProps) {
   return (
-    <div className={cn(className, "max-w-7xl mx-auto overflow-x-hidden")}>
+    <div className={cn(className, "max-w-6xl mx-auto overflow-x-hidden")}>
       {children}
     </div>
   );

@@ -3,9 +3,9 @@ import { createRoot } from 'react-dom/client';
 import { ClerkProvider, useAuth, useUser } from '@clerk/chrome-extension';
 import { ExternalLink, UserRound } from 'lucide-react';
 import './index.css';
+import { extensionUrl, extensionProtocol } from '../lib/browser';
 
 const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
-const extensionUrl = typeof chrome !== 'undefined' && chrome.runtime?.id ? chrome.runtime.getURL('index.html') : undefined;
 
 function PopupAccount() {
   const { isLoaded, isSignedIn } = useAuth();
@@ -58,6 +58,6 @@ export function ExtensionPopup() {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {publishableKey && extensionUrl ? <ClerkProvider publishableKey={publishableKey} allowedRedirectProtocols={['chrome-extension:']} signInFallbackRedirectUrl={extensionUrl} signUpFallbackRedirectUrl={extensionUrl}><ExtensionPopup /></ClerkProvider> : <ExtensionPopup />}
+    {publishableKey && extensionUrl ? <ClerkProvider publishableKey={publishableKey} allowedRedirectProtocols={extensionProtocol ? [extensionProtocol] : []} signInFallbackRedirectUrl={extensionUrl} signUpFallbackRedirectUrl={extensionUrl}><ExtensionPopup /></ClerkProvider> : <ExtensionPopup />}
   </StrictMode>,
 );

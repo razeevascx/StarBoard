@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export function HeroSection() {
   return (
-    <section aria-labelledby="hero-title" className="mx-auto min-h-[90dvh] max-w-7xl px-6 py-16 sm:px-8 sm:py-24">
+    <section aria-labelledby="hero-title" className="mx-auto min-h-[90dvh] max-w-6xl px-6 py-16 sm:px-8 sm:py-24">
       <div className="relative z-10 max-w-4xl">
         <h1 id="hero-title" className="text-5xl font-semibold leading-[1.04] tracking-tight text-balance sm:text-6xl lg:text-7xl">Save every link worth keeping.</h1>
         <p className="mt-6 max-w-xl text-base leading-7 text-ctp-subtext1 sm:text-lg">

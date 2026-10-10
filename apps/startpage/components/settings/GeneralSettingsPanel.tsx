@@ -150,7 +150,7 @@ export default function GeneralSettingsPanel({
             <div className="space-y-1">
               <span className="text-xs font-bold text-ctp-text">Browser Bookmarks</span>
               <p className="text-[10px] text-ctp-subtext0 uppercase tracking-wider">
-                {isBookmarkSupported ? "Access your Chrome bookmarks" : "Not supported in this browser"}
+                {isBookmarkSupported ? "Access your browser bookmarks" : "Not supported in this browser"}
               </p>
               {!hasPermission.bookmarks && config.showBookmarks && (
                 <p className="text-[10px] text-ctp-subtext0">Using sample bookmarks because browser permission is not granted.</p>

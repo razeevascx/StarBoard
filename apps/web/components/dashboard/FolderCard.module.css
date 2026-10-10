@@ -1,0 +1,88 @@
+.link {
+  --folder-edge: color-mix(in srgb, var(--folder-color), white 40%);
+}
+
+.visual {
+  position: relative;
+  width: 209px;
+  max-width: 100%;
+  height: 225px;
+  pointer-events: none;
+}
+
+.stage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 321px;
+  height: 270px;
+  transform: translate(-50%, -50%) scale(0.65);
+  perspective: 800px;
+}
+
+.back {
+  position: absolute;
+  inset: 0;
+  border-radius: 25px;
+  background: var(--folder-color);
+  box-shadow: inset 0 0 6px 2px rgb(255 255 255 / 35%), 0 18px 35px rgb(0 0 0 / 12%);
+}
+
+.paper {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  width: 164px;
+  max-width: none;
+  height: 214px;
+  overflow: visible;
+  filter: drop-shadow(0 3px 5px rgb(0 0 0 / 12%));
+  transform: translate(-50%, -50%) translateY(-60px);
+  transition: transform 550ms cubic-bezier(0.22, 1.4, 0.36, 1);
+}
+
+.flap {
+  position: absolute;
+  z-index: 2;
+  top: 30px;
+  left: 0;
+  width: 321px;
+  height: 241px;
+  transform-origin: bottom center;
+  transform: rotateX(-15deg);
+  transition: transform 550ms cubic-bezier(0.22, 1.4, 0.36, 1);
+}
+
+.flap svg,
+.glass {
+  position: absolute;
+  inset: 0;
+}
+
+.glass {
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  clip-path: path("M0 25C0 11.1929 11.1929 0 25 0H136.084C143.044 0 149.689 2.90139 154.42 8.00608L178.08 33.5343C182.811 38.639 189.456 41.5404 196.416 41.5404H296C309.807 41.5404 321 52.7333 321 66.5404V216C321 229.807 309.807 241 296 241H25C11.1929 241 0 229.807 0 216V25Z");
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.link:is(:hover, :focus-visible) .paper {
+  transform: translate(-50%, -50%) translateY(-85px) rotate(-3deg);
+}
+
+.link:is(:hover, :focus-visible) .flap {
+  transform: rotateX(-45deg);
+}
+
+.link:active .flap {
+  transform: rotateX(-55deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .paper,
+  .flap {
+    transition: none;
+  }
+}

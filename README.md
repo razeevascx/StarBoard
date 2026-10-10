@@ -20,7 +20,7 @@ _A calmer new-tab dashboard for the links, bookmarks, and time you use every day
 
 ## Overview
 
-Starboard is a focused browser start page that brings your clock, greeting, search, quick links, and bookmarks into one quiet dashboard. The Chrome extension replaces the new-tab page, while the companion Next.js app provides an authenticated bookmark library with collections and trash management.
+Starboard is a focused browser start page that brings your clock, greeting, search, quick links, and bookmarks into one quiet dashboard. The extension replaces the new-tab page in Chrome, Firefox, and Safari, while the companion Next.js app provides an authenticated bookmark library with collections and trash management.
 
 Both apps live in this repository; no submodule or second clone is needed.
 
@@ -41,6 +41,8 @@ It is built for people who want their most-used links close at hand without turn
 | ---------------- | --------------------------------------------------- | ----------------------- |
 | `apps/startpage` | Vite-powered Chrome extension and popup             | `chrome://extensions`   |
 | `apps/web`       | Next.js dashboard, authentication, and bookmark API | `http://localhost:3000` |
+
+For Firefox and Safari builds and installation, see [the extension guide](apps/startpage/README.md#firefox). Safari packaging requires full Xcode, and Safari does not expose native browser bookmarks.
 
 The extension uses local browser storage for settings and can access real bookmarks through the optional Chrome bookmarks permission. The web app uses Neon Postgres for synced bookmark data and Clerk for authentication.
 

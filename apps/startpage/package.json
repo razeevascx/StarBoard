@@ -17,6 +17,11 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "build:extension": "bun run build",
+    "build:firefox": "tsc -b && vite build --mode firefox",
+    "build:safari": "tsc -b && vite build --mode safari",
+    "build:all": "bun run build && bun run build:firefox && bun run build:safari",
+    "package:firefox": "bun run build:firefox && cd dist-firefox && zip -r ../starboard-firefox.zip . -x '*.map'",
+    "safari:convert": "bun run build:safari && xcrun safari-web-extension-converter dist-safari --project-location safari --app-name Starboard --bundle-identifier com.razeev.starboard --macos-only --no-open --no-prompt",
     "package": "bun run build && zip -r starboard-extension.zip dist",
     "lint": "eslint .",
     "preview": "vite preview"

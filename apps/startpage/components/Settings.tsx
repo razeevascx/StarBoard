@@ -6,6 +6,7 @@ import GeneralSettingsPanel from "./settings/GeneralSettingsPanel";
 import QuickLinksSettingsPanel from "./settings/QuickLinksSettingsPanel";
 import About from "./settings/About";
 import AccountSync from "./AccountSync";
+import { extensionUrl } from "../lib/browser";
 
 interface LinkItem {
   id: string;
@@ -124,7 +125,7 @@ const Settings = memo(function Settings({
         <div className="flex-1 overflow-y-auto pr-2 space-y-6 custom-scrollbar">
           {renderActiveTab()}
           <div className={activeTab === "account" ? "" : "hidden"}>
-            {import.meta.env.VITE_CLERK_PUBLISHABLE_KEY && typeof chrome !== "undefined" && chrome.runtime?.id ? (
+            {import.meta.env.VITE_CLERK_PUBLISHABLE_KEY && extensionUrl ? (
               <AccountSync />
             ) : (
               <p className="text-sm text-ctp-subtext0">Account sign-in is available in the installed extension after its Clerk publishable key is configured.</p>

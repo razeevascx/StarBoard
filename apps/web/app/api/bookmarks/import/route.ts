@@ -1,15 +1,17 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { ensureProfile, importBookmarks, type ImportedBookmark } from "@/lib/library";
 
-const developmentOrigin = "chrome-extension://nffmgglgjaeedmehgkcphjhpmdnepjbm";
-
 function corsHeaders(request: Request) {
-  const configured = process.env.BOOKMARK_SYNC_ALLOWED_ORIGINS ??
-    (process.env.NODE_ENV === "development" ? developmentOrigin : "");
+  const configured = process.env.BOOKMARK_SYNC_ALLOWED_ORIGINS ?? "";
   const allowedOrigins = configured.split(",").map((origin) => origin.trim()).filter(Boolean);
   const origin = request.headers.get("origin");
+  const isLocalExtension = process.env.NODE_ENV === "development" &&
+    origin !== null && (
+      /^chrome-extension:\/\/[a-p]{32}$/.test(origin) ||
+      /^(?:moz-extension|safari-web-extension):\/\/[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(origin)
+    );
 
-  if (!origin || !allowedOrigins.includes(origin)) return null;
+  if (!origin || (!isLocalExtension && !allowedOrigins.includes(origin))) return null;
   return {
     "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Methods": "POST, OPTIONS",

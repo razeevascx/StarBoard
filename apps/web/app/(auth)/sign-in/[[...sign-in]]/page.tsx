@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { authAppearance } from "@/lib/auth-appearance";
 import { SignIn } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
@@ -8,8 +9,11 @@ export const metadata: Metadata = {
 
 export default function SignInPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <SignIn />
-    </div>
+    <SignIn
+      routing="path"
+      path="/sign-in"
+      signUpUrl="/sign-up"
+      appearance={authAppearance}
+    />
   );
 }

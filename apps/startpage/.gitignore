@@ -9,6 +9,10 @@ lerna-debug.log*
 
 node_modules
 dist
+dist-firefox
+dist-safari
+starboard-*.zip
+safari/
 dist-ssr
 *.local
 

@@ -44,7 +44,7 @@ const BookmarkManager = memo(function BookmarkManager({
     ));
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-12">
+    <div className="w-full max-w-6xl mx-auto space-y-12">
       {/* Navigation Tabs */}
 
       {/* Content Area */}
@@ -67,7 +67,7 @@ const BookmarkManager = memo(function BookmarkManager({
         </aside>
       ) : (
         <div className="fixed bottom-0 left-0 z-50 w-full border-t border-ctp-surface1/30 bg-ctp-mantle/30 backdrop-blur-xl">
-          <div className="mx-auto max-w-7xl">
+          <div className="mx-auto max-w-6xl">
             <div className="flex items-center justify-center">
               <div className="flex overflow-x-auto no-scrollbar bg-ctp-surface0/50 p-1 text-md">
                 {folderButtons}

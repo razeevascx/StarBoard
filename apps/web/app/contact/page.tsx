@@ -9,7 +9,9 @@ const siteUrl = getSiteUrl();
 export const metadata: Metadata = {
   title: "Contact | Starboard",
   description: "Get in touch with the Starboard team.",
-  alternates: siteUrl ? { canonical: new URL("/contact", siteUrl).href } : undefined,
+  alternates: siteUrl
+    ? { canonical: new URL("/contact", siteUrl).href }
+    : undefined,
   openGraph: {
     type: "website",
     siteName: "Starboard",
@@ -21,9 +23,9 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <div id="top" className="min-h-screen bg-ctp-base text-ctp-text">
+    <div id="top" className="flex min-h-dvh flex-col bg-ctp-base text-ctp-text">
       <Navbar />
-      <main id="main" tabIndex={-1}>
+      <main id="main" tabIndex={-1} className="flex flex-1 items-center">
         <ContactSection />
       </main>
       <Footer />

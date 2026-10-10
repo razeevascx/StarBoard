@@ -2,6 +2,30 @@ import type { Dispatch, SetStateAction } from "react";
 
 declare const browser: typeof chrome | undefined;
 
+// All supported browsers expose Promise-based WebExtension APIs.
+export const extensionApi =
+  typeof browser !== "undefined"
+    ? browser
+    : typeof chrome !== "undefined"
+      ? chrome
+      : undefined;
+export const extensionUrl = extensionApi?.runtime?.id
+  ? extensionApi.runtime.getURL("index.html")
+  : undefined;
+export const extensionProtocol = extensionUrl
+  ? new URL(extensionUrl).protocol
+  : undefined;
+
+export function supportsBookmarkAccess() {
+  return (
+    !!extensionApi?.permissions &&
+    (!!extensionApi.bookmarks?.getTree ||
+      !!extensionApi.runtime
+        ?.getManifest()
+        .optional_permissions?.includes("bookmarks"))
+  );
+}
+
 interface BraveNavigator extends Navigator {
   brave?: {
     isBrave?: () => boolean | Promise<boolean>;
@@ -12,23 +36,32 @@ export interface PermissionState {
   bookmarks: boolean;
 }
 
-const userAgent = typeof navigator !== "undefined" ? navigator.userAgent.toLowerCase() : "";
+const userAgent =
+  typeof navigator !== "undefined" ? navigator.userAgent.toLowerCase() : "";
 const vendor = typeof navigator !== "undefined" ? navigator.vendor : "";
 const platform = typeof navigator !== "undefined" ? navigator.platform : "";
-const braveNavigator = typeof navigator !== "undefined" ? (navigator as BraveNavigator) : undefined;
+const braveNavigator =
+  typeof navigator !== "undefined" ? (navigator as BraveNavigator) : undefined;
 const chromeGlobal = typeof window !== "undefined" ? window.chrome : undefined;
 
-export const isFirefox = typeof browser !== "undefined" && userAgent.includes("firefox");
+export const isFirefox =
+  typeof browser !== "undefined" && userAgent.includes("firefox");
 export const isFirefoxAll = userAgent.includes("firefox");
 export const isChromiumBased =
   !!chromeGlobal &&
   ("webstore" in chromeGlobal || "runtime" in chromeGlobal) &&
   !isFirefox;
-export const isEdge = /Edg/.test(typeof navigator !== "undefined" ? navigator.userAgent : "");
+export const isEdge = /Edg/.test(
+  typeof navigator !== "undefined" ? navigator.userAgent : "",
+);
 export const isBrave = !!braveNavigator?.brave?.isBrave?.();
-export const isOpera = /OPR/.test(typeof navigator !== "undefined" ? navigator.userAgent : "");
+export const isOpera = /OPR/.test(
+  typeof navigator !== "undefined" ? navigator.userAgent : "",
+);
 export const isChrome =
-  (/Chrome|CriOS/.test(typeof navigator !== "undefined" ? navigator.userAgent : "")) &&
+  /Chrome|CriOS/.test(
+    typeof navigator !== "undefined" ? navigator.userAgent : "",
+  ) &&
   /Google Inc/.test(vendor) &&
   !isEdge &&
   !isBrave &&
@@ -40,12 +73,17 @@ export const isSafari =
 export const isMac = /Macintosh|MacIntel|MacPPC|Mac68K/.test(platform);
 export const isDesktop = !/Android|iPhone|iPad|iPod/.test(userAgent);
 
-export function checkPermissions(setHasPermission: Dispatch<SetStateAction<PermissionState>>) {
-  if (typeof chrome === "undefined" || !chrome.permissions) return;
+export function checkPermissions(
+  setHasPermission: Dispatch<SetStateAction<PermissionState>>,
+) {
+  if (!supportsBookmarkAccess()) return;
 
-  chrome.permissions.contains({ permissions: ["bookmarks"] }, (result) => {
-    setHasPermission((prev) => ({ ...prev, bookmarks: result }));
-  });
+  void extensionApi!.permissions
+    .contains({ permissions: ["bookmarks"] })
+    .then((result) => {
+      setHasPermission((prev) => ({ ...prev, bookmarks: result }));
+    })
+    .catch(() => setHasPermission((prev) => ({ ...prev, bookmarks: false })));
 }
 
 export function requestPermission(
@@ -54,19 +92,22 @@ export function requestPermission(
   onPermissionStateChange: (perm: "bookmarks") => void,
   onDenied?: () => void,
 ) {
-  if (typeof chrome === "undefined" || !chrome.permissions) {
+  if (!supportsBookmarkAccess()) {
     onDenied?.();
     return;
   }
 
-  chrome.permissions.request({ permissions: [perm] }, (granted) => {
-    if (granted) {
-      onPermissionStateChange(perm);
-      onGranted();
-    } else {
-      onDenied?.();
-    }
-  });
+  void extensionApi!.permissions
+    .request({ permissions: [perm] })
+    .then((granted) => {
+      if (granted) {
+        onPermissionStateChange(perm);
+        onGranted();
+      } else {
+        onDenied?.();
+      }
+    })
+    .catch(() => onDenied?.());
 }
 
 export function removePermission(
@@ -74,12 +115,15 @@ export function removePermission(
   onRevoked: () => void,
   onPermissionStateChange: (perm: "bookmarks") => void,
 ) {
-  if (typeof chrome === "undefined" || !chrome.permissions) return;
+  if (!extensionApi?.permissions) return;
 
-  chrome.permissions.remove({ permissions: [perm] }, (removed) => {
-    if (removed) {
-      onPermissionStateChange(perm);
-      onRevoked();
-    }
-  });
+  void extensionApi.permissions
+    .remove({ permissions: [perm] })
+    .then((removed) => {
+      if (removed) {
+        onPermissionStateChange(perm);
+        onRevoked();
+      }
+    })
+    .catch(() => {});
 }

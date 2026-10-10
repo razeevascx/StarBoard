@@ -2,8 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth, useClerk, useUser } from '@clerk/chrome-extension';
 import { ArrowUpRight, Check, CloudUpload, LogOut, RefreshCw, ShieldCheck, UserRound } from 'lucide-react';
 import { readSyncBookmarks, uploadBookmarks } from '../lib/bookmark-sync';
+import { extensionApi, supportsBookmarkAccess } from '../lib/browser';
 
-const webUrl = (import.meta.env.VITE_WEB_URL || 'http://localhost:3000').replace(/\/$/, '');
+const webUrl = (import.meta.env.VITE_WEB_URL || 'https://starboard.razeev.com').replace(/\/$/, '');
 
 export default function AccountSync() {
   const { isLoaded, isSignedIn, userId, getToken } = useAuth();
@@ -16,6 +17,7 @@ export default function AccountSync() {
   const syncing = useRef(false);
   const autoSyncedForUser = useRef<string | null>(null);
   const signInRequested = useRef(false);
+  const canSyncBookmarks = supportsBookmarkAccess();
 
   useEffect(() => {
     if (!isLoaded || isSignedIn || signInRequested.current || new URLSearchParams(window.location.search).get('sign-in') !== '1') return;
@@ -50,24 +52,28 @@ export default function AccountSync() {
       autoSyncedForUser.current = null;
       return;
     }
-    if (!chrome?.permissions) return;
-    chrome.permissions.contains({ permissions: ['bookmarks'] }, (granted) => {
+    if (!canSyncBookmarks || !extensionApi?.permissions) return;
+    void extensionApi.permissions.contains({ permissions: ['bookmarks'] }).then((granted) => {
       setHasPermission(granted);
       if (granted && autoSyncedForUser.current !== userId) {
         autoSyncedForUser.current = userId;
         void sync();
       }
-    });
-  }, [isLoaded, isSignedIn, sync, userId]);
+    }).catch(() => setHasPermission(false));
+  }, [canSyncBookmarks, isLoaded, isSignedIn, sync, userId]);
 
   const enableSync = () => {
-    chrome.permissions.request({ permissions: ['bookmarks'] }, (granted) => {
+    if (!canSyncBookmarks || !extensionApi?.permissions) return;
+    void extensionApi.permissions.request({ permissions: ['bookmarks'] }).then((granted) => {
       setHasPermission(granted);
       if (granted) void sync();
       else {
         setStatus('Bookmark access is needed to sync.');
         setSyncState('error');
       }
+    }).catch((error: unknown) => {
+      setStatus(error instanceof Error ? error.message : 'Unable to request bookmark access.');
+      setSyncState('error');
     });
   };
 
@@ -110,18 +116,18 @@ export default function AccountSync() {
               <div className="flex size-10 shrink-0 items-center justify-center bg-ctp-mauve/15 text-ctp-mauve"><CloudUpload className="size-5" aria-hidden="true" /></div>
               <div className="min-w-0 flex-1">
                 <h4 className="text-base font-bold">Bookmark sync</h4>
-                <p className="mt-1 text-xs leading-5 text-ctp-subtext0">Keep your browser bookmarks available in your Starboard dashboard.</p>
+                <p className="mt-1 text-xs leading-5 text-ctp-subtext0">{canSyncBookmarks ? 'Keep your browser bookmarks available in your Starboard dashboard.' : 'This browser does not provide access to bookmarks. You can still manage bookmarks in your web dashboard.'}</p>
               </div>
             </div>
             <div className="mt-5 flex items-center gap-2 border-y border-ctp-surface1/30 py-3 text-xs">
               <ShieldCheck className={hasPermission ? 'size-4 shrink-0 text-ctp-green' : 'size-4 shrink-0 text-ctp-yellow'} aria-hidden="true" />
               <span className="flex-1 text-ctp-subtext1">Browser bookmark access</span>
-              <span className={hasPermission ? 'font-bold text-ctp-green' : 'font-bold text-ctp-yellow'}>{hasPermission ? 'Enabled' : 'Needed'}</span>
+              <span className={hasPermission ? 'font-bold text-ctp-green' : 'font-bold text-ctp-yellow'}>{!canSyncBookmarks ? 'Unavailable' : hasPermission ? 'Enabled' : 'Needed'}</span>
             </div>
             <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-              <button type="button" disabled={syncState === 'syncing'} onClick={hasPermission ? () => void sync() : enableSync} className="inline-flex min-h-10 items-center gap-2 bg-ctp-mauve px-4 text-xs font-bold text-ctp-base transition-colors hover:bg-ctp-lavender disabled:cursor-wait disabled:opacity-60">
+              <button type="button" disabled={!canSyncBookmarks || syncState === 'syncing'} onClick={hasPermission ? () => void sync() : enableSync} className="inline-flex min-h-10 items-center gap-2 bg-ctp-mauve px-4 text-xs font-bold text-ctp-base transition-colors hover:bg-ctp-lavender disabled:cursor-not-allowed disabled:opacity-60">
                 <RefreshCw className={syncState === 'syncing' ? 'size-4 animate-spin' : 'size-4'} aria-hidden="true" />
-                {syncState === 'syncing' ? 'Syncing…' : hasPermission ? 'Sync bookmarks' : 'Enable sync'}
+                {!canSyncBookmarks ? 'Bookmark sync unavailable' : syncState === 'syncing' ? 'Syncing…' : hasPermission ? 'Sync bookmarks' : 'Enable sync'}
               </button>
               {syncedCount !== null && <span className="text-xs text-ctp-subtext0">{syncedCount} {syncedCount === 1 ? 'bookmark' : 'bookmarks'} synced</span>}
             </div>

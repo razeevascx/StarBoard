@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ArrowUpRight, FolderClosed } from "lucide-react";
 import { auth } from "@clerk/nextjs/server";
+import { FolderCard } from "@/components/dashboard/FolderCard";
 import { SectionHeading } from "@/components/SectionHeading";
 import { listCollections } from "@/lib/library";
 import { collectionColor } from "@/lib/collection-colors";
@@ -16,22 +15,17 @@ export default async function CollectionsPage() {
 
   return (
     <>
-      <SectionHeading id="collections-title" title="Collections" description="Keep related bookmarks together." />
       {collections.length ? (
-        <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <ul className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {collections.map((collection) => (
             <li key={collection.id}>
-              <Link href={`/dashboard/collections/${collection.id}`} className="group flex h-full min-h-44 flex-col bg-ctp-mantle/40 p-5 transition-colors hover:bg-ctp-surface0/40" style={{ boxShadow: `inset 3px 0 ${collectionColor(collection.id, collection.color)}` }}>
-                <div className="flex items-start justify-between">
-                  <span className="flex size-12 items-center justify-center" style={{ color: collectionColor(collection.id, collection.color), backgroundColor: `${collectionColor(collection.id, collection.color)}22` }}>
-                    <FolderClosed className="size-6" strokeWidth={1.7} aria-hidden="true" />
-                  </span>
-                  <ArrowUpRight className="size-4 text-ctp-overlay0 transition-colors group-hover:text-ctp-mauve" aria-hidden="true" />
-                </div>
-                <h2 className="mt-4 break-words font-semibold text-ctp-text group-hover:text-ctp-mauve">{collection.name}</h2>
-                {collection.description && <p className="mt-1 line-clamp-2 text-sm text-ctp-subtext0">{collection.description}</p>}
-                <p className="mt-auto pt-4 text-xs font-medium text-ctp-overlay0">{collection.bookmarkCount} {collection.bookmarkCount === 1 ? "bookmark" : "bookmarks"}</p>
-              </Link>
+              <FolderCard
+                href={`/dashboard/collections/${collection.id}`}
+                name={collection.name}
+                description={collection.description}
+                bookmarkCount={collection.bookmarkCount}
+                color={collectionColor(collection.id, collection.color)}
+              />
             </li>
           ))}
         </ul>
