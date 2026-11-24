@@ -1,6 +1,6 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
-import { ensureProfile, importBookmarks, type ImportedBookmark } from "@/lib/library";
+import { ensureProfile, importBookmarks, listBookmarks, type ImportedBookmark } from "@/lib/library";
 
 function corsHeaders(request: Request) {
   const configured = process.env.BOOKMARK_SYNC_ALLOWED_ORIGINS ?? "";
@@ -15,7 +15,7 @@ function corsHeaders(request: Request) {
   if (!origin || (!isLocalExtension && !allowedOrigins.includes(origin))) return null;
   return {
     "Access-Control-Allow-Origin": origin,
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Allow-Headers": "Authorization, Content-Type",
     "Access-Control-Max-Age": "600",
     "Vary": "Origin",
@@ -26,6 +26,18 @@ export function OPTIONS(request: Request) {
   const headers = corsHeaders(request);
   if (!headers) return new Response(null, { status: 403 });
   return new Response(null, { status: 204, headers });
+}
+
+export async function GET(request: Request) {
+  const origin = request.headers.get("origin");
+  const headers = corsHeaders(request);
+  if (origin && !headers) return Response.json({ error: "Origin not allowed." }, { status: 403 });
+
+  const { userId } = await auth();
+  if (!userId) return Response.json({ error: "Sign in required." }, { status: 401, headers: headers ?? {} });
+
+  const bookmarks = await listBookmarks(userId);
+  return Response.json({ bookmarks }, { headers: headers ?? {} });
 }
 
 export async function POST(request: Request) {

@@ -108,3 +108,86 @@ export async function uploadBookmarks(
       throw new Error(`Unexpected sync response from ${target}. Use the public dashboard URL, not a protected preview or sign-in page.`);
   }
 }
+
+export type ServerBookmark = {
+  id: string;
+  title: string;
+  url: string;
+  collectionId: string | null;
+  collectionName: string | null;
+};
+
+export async function downloadBookmarks(
+  token: string,
+  webUrl: string,
+): Promise<ServerBookmark[]> {
+  const target = new URL(webUrl).origin;
+  const response = await fetch(`${target}/api/bookmarks/import`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (response.status === 401)
+    throw new Error("Sync authentication failed. Sign out and sign in again.");
+  const result = await response.json().catch(() => null);
+  if (!response.ok)
+    throw new Error(typeof result?.error === "string" ? result.error : "Could not download bookmarks.");
+  return Array.isArray(result?.bookmarks) ? result.bookmarks : [];
+}
+
+export async function mergeServerBookmarks(
+  bookmarks: ServerBookmark[],
+): Promise<number> {
+  if (!extensionApi?.bookmarks?.getTree || !extensionApi.bookmarks.create)
+    throw new Error("This browser does not support bookmark writes.");
+
+  const tree = await extensionApi.bookmarks.getTree();
+  const existingUrls = new Set<string>();
+  const folders = new Map<string, string>();
+
+  const visit = (
+    nodes: chrome.bookmarks.BookmarkTreeNode[],
+    parentTitle: string | null = null,
+  ) => {
+    for (const node of nodes) {
+      if (node.url) existingUrls.add(node.url);
+      if (!node.url && node.title) folders.set(node.title, node.id);
+      if (node.children) visit(node.children, node.title || parentTitle);
+    }
+  };
+  visit(tree);
+
+  const root = tree[0];
+  const bar = root?.children?.find((node) => node.id === "1" || node.id === "toolbar_____")
+    ?? root?.children?.find((node) => /bar|toolbar/i.test(node.title));
+  const defaultParentId = bar?.id ?? root?.children?.[0]?.id ?? root?.id;
+  if (!defaultParentId) return 0;
+
+  let added = 0;
+  for (const bookmark of bookmarks) {
+    if (!bookmark.url || existingUrls.has(bookmark.url)) continue;
+
+    let parentId = defaultParentId;
+    const folderName = bookmark.collectionName?.trim();
+    if (folderName) {
+      const existingFolderId = folders.get(folderName);
+      if (existingFolderId) {
+        parentId = existingFolderId;
+      } else {
+        const folder = await extensionApi.bookmarks.create({
+          parentId: defaultParentId,
+          title: folderName,
+        });
+        folders.set(folderName, folder.id);
+        parentId = folder.id;
+      }
+    }
+
+    await extensionApi.bookmarks.create({
+      parentId,
+      title: bookmark.title || bookmark.url,
+      url: bookmark.url,
+    });
+    existingUrls.add(bookmark.url);
+    added++;
+  }
+  return added;
+}

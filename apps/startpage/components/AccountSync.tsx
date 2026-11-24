@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth, useClerk, useUser } from '@clerk/chrome-extension';
 import { ArrowUpRight, Check, CloudUpload, LogOut, RefreshCw, ShieldCheck, UserRound } from 'lucide-react';
-import { readSyncBookmarks, uploadBookmarks } from '../lib/bookmark-sync';
+import { downloadBookmarks, mergeServerBookmarks, readSyncBookmarks, uploadBookmarks } from '../lib/bookmark-sync';
 import { extensionApi, extensionUrl, supportsBookmarkAccess } from '../lib/browser';
 
 const webUrl = (import.meta.env.VITE_WEB_URL || 'https://starboard.razeev.com').replace(/\/$/, '');
@@ -62,8 +62,11 @@ export default function AccountSync() {
       if (!token) throw new Error('Your session expired. Please sign in again.');
       const bookmarks = await readSyncBookmarks();
       await uploadBookmarks(bookmarks, token, webUrl);
-      setSyncedCount(bookmarks.length);
-      setStatus(`${bookmarks.length} bookmarks synced`);
+      const serverBookmarks = await downloadBookmarks(token, webUrl);
+      const downloadedCount = await mergeServerBookmarks(serverBookmarks);
+      const syncedCount = Math.max(bookmarks.length, serverBookmarks.length);
+      setSyncedCount(syncedCount);
+      setStatus(`${syncedCount} bookmarks synced${downloadedCount ? ` · ${downloadedCount} added locally` : ''}`);
       setSyncState('success');
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Bookmark sync failed.');
@@ -87,6 +90,27 @@ export default function AccountSync() {
       }
     }).catch(() => setHasPermission(false));
   }, [canSyncBookmarks, isLoaded, isSignedIn, sync, userId]);
+
+  useEffect(() => {
+    const bookmarksApi = extensionApi?.bookmarks;
+    if (!isLoaded || !isSignedIn || !hasPermission || !bookmarksApi) return;
+
+    const refreshTimer = window.setInterval(() => void sync(), 60_000);
+    const refreshSync = () => window.setTimeout(() => void sync(), 100);
+
+    bookmarksApi.onCreated?.addListener(refreshSync);
+    bookmarksApi.onRemoved?.addListener(refreshSync);
+    bookmarksApi.onChanged?.addListener(refreshSync);
+    bookmarksApi.onMoved?.addListener(refreshSync);
+
+    return () => {
+      window.clearInterval(refreshTimer);
+      bookmarksApi.onCreated?.removeListener(refreshSync);
+      bookmarksApi.onRemoved?.removeListener(refreshSync);
+      bookmarksApi.onChanged?.removeListener(refreshSync);
+      bookmarksApi.onMoved?.removeListener(refreshSync);
+    };
+  }, [hasPermission, isLoaded, isSignedIn, sync]);
 
   const enableSync = () => {
     if (!canSyncBookmarks || !extensionApi?.permissions) return;
