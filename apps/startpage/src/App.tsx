@@ -6,7 +6,7 @@ import BookmarkManager from '../components/BookmarkManager';
 
 import Box from '../components/Box';
 import { cn } from '../lib/cn';
-import { checkPermissions, requestPermission, removePermission, type PermissionState } from '../lib/browser';
+import { checkPermissions, extensionApi, requestPermission, removePermission, type PermissionState } from '../lib/browser';
 import {
   fetchInitialBookmarks,
   toBookmarkLinks,
@@ -121,6 +121,34 @@ export default function App() {
       return () => { cancelled = true; };
     }
   }, [hasPermission, config.showBookmarks]);
+
+  useEffect(() => {
+    const bookmarksApi = extensionApi?.bookmarks;
+    if (!config.showBookmarks || !hasPermission.bookmarks || !bookmarksApi) return;
+
+    let refreshTimer: number | undefined;
+    const refreshBookmarks = () => {
+      window.clearTimeout(refreshTimer);
+      refreshTimer = window.setTimeout(() => {
+        fetchInitialBookmarks(setTopLevelFolders, setActiveFolderId, setBrowserBookmarks, () => {});
+      }, 100);
+    };
+
+    bookmarksApi.onCreated?.addListener(refreshBookmarks);
+    bookmarksApi.onRemoved?.addListener(refreshBookmarks);
+    bookmarksApi.onChanged?.addListener(refreshBookmarks);
+    bookmarksApi.onMoved?.addListener(refreshBookmarks);
+    bookmarksApi.onChildrenReordered?.addListener(refreshBookmarks);
+
+    return () => {
+      window.clearTimeout(refreshTimer);
+      bookmarksApi.onCreated?.removeListener(refreshBookmarks);
+      bookmarksApi.onRemoved?.removeListener(refreshBookmarks);
+      bookmarksApi.onChanged?.removeListener(refreshBookmarks);
+      bookmarksApi.onMoved?.removeListener(refreshBookmarks);
+      bookmarksApi.onChildrenReordered?.removeListener(refreshBookmarks);
+    };
+  }, [config.showBookmarks, hasPermission.bookmarks]);
 
   useEffect(() => {
     saveConfig(config);

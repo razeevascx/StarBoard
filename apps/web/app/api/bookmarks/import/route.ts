@@ -1,4 +1,5 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
 import { ensureProfile, importBookmarks, type ImportedBookmark } from "@/lib/library";
 
 function corsHeaders(request: Request) {
@@ -70,5 +71,7 @@ export async function POST(request: Request) {
     folderSourceId: item.folderSourceId ?? null,
     folderName: item.folderName ?? null,
   })));
+  revalidatePath("/dashboard/bookmarks");
+  revalidatePath("/dashboard/collections");
   return Response.json({ imported: items.length }, { headers: headers ?? {} });
 }
