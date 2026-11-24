@@ -1,4 +1,11 @@
 import type { ReactNode } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/hangry-ui/components/card";
 
 type DashboardCardProps = {
   title: string;
@@ -8,10 +15,12 @@ type DashboardCardProps = {
 
 export function DashboardCard({ title, description, children }: DashboardCardProps) {
   return (
-    <section className="flex flex-col rounded-md border border-ctp-surface1/60 bg-ctp-mantle p-6 sm:p-8">
-      <h2 className="text-xl font-semibold tracking-tight">{title}</h2>
-      <p className="mt-3 max-w-lg text-sm leading-6 text-ctp-subtext1">{description}</p>
-      <div className="mt-auto pt-8">{children}</div>
-    </section>
+    <Card className="max-w-none sm:p-8">
+      <CardHeader>
+        <CardTitle className="text-xl">{title}</CardTitle>
+        <CardDescription className="max-w-lg text-sm leading-6">{description}</CardDescription>
+      </CardHeader>
+      <CardContent className="mt-auto pt-2">{children}</CardContent>
+    </Card>
   );
 }

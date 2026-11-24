@@ -4,6 +4,8 @@ import { useState, useTransition, type FormEvent } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Palette, Plus } from "lucide-react";
 import { createCollectionAction } from "@/app/dashboard/collections/actions";
+import { Tabs, TabsList, TabsTrigger } from "@/components/hangry-ui/components/tabs";
+import { toast } from "@/components/hangry-ui/components/toast";
 import { COLLECTION_COLORS } from "@/lib/collection-colors";
 import type { Collection } from "@/lib/library";
 import { BookmarkForm } from "./BookmarkForm";
@@ -26,39 +28,48 @@ export function CreateButton({ collections }: { collections: Collection[] }) {
     startTransition(async () => {
       try {
         await createCollectionAction(formData);
+        const name = String(formData.get("name") ?? "").trim();
+        toast.success("Collection created", { description: name || undefined });
         router.refresh();
         setOpen(false);
       } catch {
         setError("Unable to create collection. Try another name.");
+        toast.error("Unable to create collection", { description: "Try another name." });
       }
     });
   };
 
   return (
     <>
-      <button type="button" aria-label="Add bookmark or collection" title="Add bookmark or collection" onClick={() => setOpen(true)} className="inline-flex size-11 items-center justify-center bg-ctp-mauve text-ctp-base shadow-lg shadow-ctp-mauve/15 transition-colors hover:bg-ctp-lavender">
+      <button type="button" aria-label="Add bookmark or collection" title="Add bookmark or collection" onClick={() => setOpen(true)} className="inline-flex size-11 items-center justify-center rounded-lg bg-ctp-mauve text-ctp-base shadow-lg shadow-ctp-mauve/20 transition-colors hover:bg-ctp-lavender">
         <Plus className="size-5" aria-hidden="true" />
       </button>
       {open && (
         <EditorDialog title={kind === "bookmark" ? "Add bookmark" : "Add collection"} onClose={() => setOpen(false)}>
-          <div className="mb-6 flex bg-ctp-base p-1">
-            {(["bookmark", "collection"] as const).map((option) => (
-              <button key={option} type="button" onClick={() => { setKind(option); setError(""); }} className={`min-h-10 flex-1 text-sm font-medium capitalize ${kind === option ? "bg-ctp-surface0 text-ctp-text" : "text-ctp-subtext0 hover:text-ctp-text"}`}>
-                {option}
-              </button>
-            ))}
-          </div>
+          <Tabs
+            value={kind}
+            onValueChange={(value) => {
+              setKind(value === "collection" ? "collection" : "bookmark");
+              setError("");
+            }}
+            className="mb-6"
+          >
+            <TabsList aria-label="Item type" className="w-full">
+              <TabsTrigger value="bookmark">Bookmark</TabsTrigger>
+              <TabsTrigger value="collection">Collection</TabsTrigger>
+            </TabsList>
+          </Tabs>
           {kind === "bookmark" ? (
             <BookmarkForm collections={collections} defaultCollectionId={selectedCollectionId} onSaved={() => setOpen(false)} />
           ) : (
             <form onSubmit={submitCollection} className="space-y-4">
               <label className="block space-y-1.5 text-sm font-medium text-ctp-subtext1">
                 <span>Name</span>
-                <input name="name" required maxLength={120} placeholder="e.g. Inspo" className="min-h-11 w-full border border-ctp-surface1 bg-ctp-base px-3 text-ctp-text outline-none focus:border-ctp-mauve" />
+                <input name="name" required maxLength={120} placeholder="e.g. Inspo" className="min-h-11 w-full rounded-md border border-ctp-surface1 bg-ctp-base px-3 text-ctp-text outline-none focus:border-ctp-mauve" />
               </label>
               <label className="block space-y-1.5 text-sm font-medium text-ctp-subtext1">
                 <span>Description <span className="font-normal text-ctp-overlay0">(optional)</span></span>
-                <input name="description" maxLength={500} className="min-h-11 w-full border border-ctp-surface1 bg-ctp-base px-3 text-ctp-text outline-none focus:border-ctp-mauve" />
+                <input name="description" maxLength={500} className="min-h-11 w-full rounded-md border border-ctp-surface1 bg-ctp-base px-3 text-ctp-text outline-none focus:border-ctp-mauve" />
               </label>
               <fieldset>
                 <legend className="mb-2 text-sm font-medium text-ctp-subtext1">Folder color</legend>
@@ -75,7 +86,7 @@ export function CreateButton({ collections }: { collections: Collection[] }) {
               </fieldset>
               {error && <p role="alert" className="text-sm text-ctp-red">{error}</p>}
               <div className="flex justify-end pt-2">
-                <button type="submit" disabled={pending} className="min-h-11 bg-ctp-mauve px-5 text-sm font-semibold text-ctp-base hover:bg-ctp-lavender disabled:opacity-60">{pending ? "Creating…" : "Create collection"}</button>
+                <button type="submit" disabled={pending} className="min-h-11 rounded-md bg-ctp-mauve px-5 text-sm font-semibold text-ctp-base hover:bg-ctp-lavender disabled:opacity-60">{pending ? "Creating…" : "Create collection"}</button>
               </div>
             </form>
           )}

@@ -19,7 +19,6 @@ export default async function DashboardPage() {
     <>
         <SectionHeading
           id="dashboard-title"
-          eyebrow="Your dashboard"
           title={name ? `Welcome, ${name}.` : "Welcome to Starboard."}
           description="Make yourself at home. Set up your browser and manage your account in one place."
         />

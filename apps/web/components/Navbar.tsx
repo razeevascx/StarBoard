@@ -10,7 +10,8 @@ import { MobileNav } from "@/components/mobile-nav";
 
 const navLinks = [
   { label: "Features", href: "/#features" },
-  { label: "Faq", href: "/#faq" },
+  { label: "MCP", href: "/#mcp" },
+  { label: "FAQ", href: "/#faq" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -22,7 +23,7 @@ export function Navbar() {
       className={cn(
         "sticky top-1 z-50 mx-auto w-full max-w-6xl border-b border-transparent bg-ctp-base md:rounded-md md:border motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out p-2",
         scrolled &&
-          "border-ctp-surface1/60 bg-ctp-base/95 backdrop-blur-sm supports-backdrop-filter:bg-ctp-base/80 md:top-2 md:max-w-5xl md:shadow-lg md:shadow-ctp-crust/20",
+          "border-ctp-surface1/70 bg-ctp-mantle/85 backdrop-blur-md supports-backdrop-filter:bg-ctp-mantle/80 md:top-2 md:max-w-5xl md:shadow-lg md:shadow-ctp-crust/30",
       )}
     >
       <nav

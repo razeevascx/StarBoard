@@ -1,5 +1,6 @@
 import { XDark } from "@ridemountainpig/svgl-react";
 import { ArrowUpRight, Bug, MessageSquare } from "lucide-react";
+import { Card } from "@/components/hangry-ui/components/card";
 import { contactUrl } from "@/lib/site";
 
 const contactLinks = [
@@ -23,8 +24,8 @@ const contactLinks = [
     title: "Say hello",
     description:
       "Connect with Razeev on X for a conversation about Starboard, or to see what’s being built next.",
-    href: "https://x.com/razeevpuree",
-    action: "Visit @razeevpuree",
+    href: "https://x.com/razeevascx",
+    action: "Visit @razeevascx",
     icon: XDark,
   },
 ];
@@ -36,9 +37,6 @@ export function ContactSection() {
       className="mx-auto w-full max-w-6xl px-6 py-16 sm:px-8 sm:py-24"
     >
       <div className="max-w-2xl">
-        <p className="mb-3 text-xs font-bold tracking-[0.2em] text-ctp-mauve uppercase">
-          Contact
-        </p>
         <h1
           id="contact-title"
           className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl"
@@ -53,12 +51,13 @@ export function ContactSection() {
       <div className="mt-10 grid gap-4 md:grid-cols-3">
         {contactLinks.map(
           ({ title, description, href, action, icon: Icon }) => (
-            <a
+            <Card
               key={title}
+              as="a"
               href={href}
               target="_blank"
               rel="noreferrer noopener"
-              className="group flex flex-col rounded-md border border-ctp-surface1/60 bg-ctp-mantle/50 p-6 transition-colors hover:border-ctp-mauve/60 hover:bg-ctp-mantle focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ctp-mauve sm:p-8"
+              className="group max-w-none gap-0 sm:p-8"
             >
               <span className="flex size-11 items-center justify-center rounded-xl bg-ctp-mauve/10 text-ctp-mauve">
                 <Icon aria-hidden="true" className="size-5" />
@@ -71,7 +70,7 @@ export function ContactSection() {
                 {action}
                 <ArrowUpRight aria-hidden="true" className="size-4 shrink-0" />
               </span>
-            </a>
+            </Card>
           ),
         )}
       </div>

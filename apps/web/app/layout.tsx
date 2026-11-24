@@ -1,6 +1,7 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Toaster } from "@/components/hangry-ui/components/toast";
 import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
@@ -61,6 +62,7 @@ export default function RootLayout({
           }}
         >
           {children}
+          <Toaster />
         </ClerkProvider>
       </body>
     </html>

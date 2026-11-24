@@ -21,20 +21,20 @@ export function Badge({
   ...props
 }: BadgeProps = {}) {
   const styles = {
-    neutral: "bg-neutral-800 text-neutral-200",
-    info: "bg-sky-400/10 text-sky-300",
-    success: "bg-emerald-400/10 text-emerald-300",
-    warning: "bg-amber-400/10 text-amber-300",
-    error: "bg-red-400/10 text-red-300",
-    blue: "bg-blue-400/10 text-blue-300",
-    purple: "bg-purple-400/10 text-purple-300",
-    pink: "bg-pink-400/10 text-pink-300",
-    teal: "bg-teal-400/10 text-teal-300",
-    orange: "bg-orange-400/10 text-orange-300",
+    neutral: "border-ctp-surface1 bg-ctp-surface0/70 text-ctp-subtext1",
+    info: "border-ctp-blue/40 bg-ctp-blue/10 text-ctp-blue",
+    success: "border-ctp-green/40 bg-ctp-green/10 text-ctp-green",
+    warning: "border-ctp-yellow/40 bg-ctp-yellow/10 text-ctp-yellow",
+    error: "border-ctp-red/40 bg-ctp-red/10 text-ctp-red",
+    blue: "border-ctp-blue/40 bg-ctp-blue/10 text-ctp-blue",
+    purple: "border-ctp-mauve/40 bg-ctp-mauve/10 text-ctp-mauve",
+    pink: "border-ctp-pink/40 bg-ctp-pink/10 text-ctp-pink",
+    teal: "border-ctp-teal/40 bg-ctp-teal/10 text-ctp-teal",
+    orange: "border-ctp-peach/40 bg-ctp-peach/10 text-ctp-peach",
   };
   return (
     <span
-      className={`inline-flex items-center border border-border px-2.5 py-1 text-xs font-medium ${styles[variant] ?? styles.success} ${className}`}
+      className={`inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-medium ${styles[variant] ?? styles.success} ${className}`}
       {...props}
     >
       {children}

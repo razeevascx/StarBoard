@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { PanelLeftClose } from "lucide-react";
 import { ModelContextProtocolDark } from "@ridemountainpig/svgl-react";
 import { Brand } from "@/components/Brand";
 import { UserMenu } from "@/components/UserMenu";
@@ -18,13 +19,37 @@ const menuSections = [
   },
 ];
 
-export function DashboardSidebar({ collections }: { collections: Collection[] }) {
+export function DashboardSidebar({
+  collections,
+  id,
+  onClose,
+}: {
+  collections: Collection[];
+  id?: string;
+  onClose?: () => void;
+}) {
   const pathname = usePathname();
 
   return (
-    <aside className="flex flex-col border-b border-ctp-surface1/40 bg-ctp-mantle/50 md:sticky md:top-0 md:h-dvh md:w-64 md:shrink-0 md:self-start md:border-r md:border-b-0">
-      <div className="px-5 py-6">
+    <aside
+      id={id}
+      className="flex flex-col border-b border-ctp-surface1/40 bg-ctp-mantle/50 md:sticky md:top-0 md:h-dvh md:w-64 md:shrink-0 md:self-start md:border-r md:border-b-0"
+    >
+      <div className="flex items-center justify-between gap-2 px-5 py-6">
         <Brand />
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close sidebar"
+            aria-expanded={true}
+            aria-controls={id}
+            title="Close sidebar (⌘B)"
+            className="inline-flex size-9 items-center justify-center rounded-md text-ctp-subtext0 transition-colors hover:bg-ctp-surface0 hover:text-ctp-text"
+          >
+            <PanelLeftClose className="size-4.5" aria-hidden="true" />
+          </button>
+        )}
       </div>
       <nav aria-label="Dashboard sections" className="flex flex-col gap-6 overflow-y-auto p-4 md:min-h-0 md:flex-1">
         {menuSections.map((section) => (

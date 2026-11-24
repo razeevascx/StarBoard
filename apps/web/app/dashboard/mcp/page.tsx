@@ -21,7 +21,6 @@ export default async function DashboardMcpPage() {
     <>
       <SectionHeading
         id="mcp-title"
-        eyebrow="Model Context Protocol"
         title="MCP"
         description="Connect AI assistants to your Starboard bookmarks, collections, and trash over OAuth."
       />

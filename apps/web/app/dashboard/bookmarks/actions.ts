@@ -3,7 +3,12 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import {
-  createBookmark, deleteBookmark, ensureProfile, restoreBookmark, updateBookmark,
+  createBookmark,
+  deleteBookmark,
+  ensureProfile,
+  permanentlyDeleteBookmark,
+  restoreBookmark,
+  updateBookmark,
 } from "@/lib/library";
 
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -74,6 +79,14 @@ export async function restoreBookmarkAction(id: string) {
   if (!uuid.test(id)) return { ok: false, error: "Invalid bookmark." };
   const userId = await signedInUser();
   await restoreBookmark(userId, id);
+  refreshLibrary();
+  return { ok: true };
+}
+
+export async function permanentlyDeleteBookmarkAction(id: string) {
+  if (!uuid.test(id)) return { ok: false, error: "Invalid bookmark." };
+  const userId = await signedInUser();
+  await permanentlyDeleteBookmark(userId, id);
   refreshLibrary();
   return { ok: true };
 }

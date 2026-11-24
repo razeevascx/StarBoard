@@ -3,9 +3,10 @@
 import { useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createBookmarkAction, updateBookmarkAction } from "@/app/dashboard/bookmarks/actions";
+import { toast } from "@/components/hangry-ui/components/toast";
 import type { Collection, SavedBookmark } from "@/lib/library";
 
-const inputClass = "min-h-11 w-full border border-ctp-surface1 bg-ctp-base px-3 text-sm text-ctp-text outline-none placeholder:text-ctp-overlay0 focus:border-ctp-mauve";
+const inputClass = "min-h-11 w-full rounded-md border border-ctp-surface1 bg-ctp-base px-3 text-sm text-ctp-text outline-none placeholder:text-ctp-overlay0 focus:border-ctp-mauve";
 
 export function BookmarkForm({ collections, bookmark, defaultCollectionId, onSaved }: {
   collections: Collection[];
@@ -27,13 +28,20 @@ export function BookmarkForm({ collections, bookmark, defaultCollectionId, onSav
           ? await updateBookmarkAction(bookmark.id, formData)
           : await createBookmarkAction(formData);
         if (!result.ok) {
-          setError(result.error ?? "Unable to save bookmark.");
+          const msg = result.error ?? "Unable to save bookmark.";
+          setError(msg);
+          toast.error("Could not save bookmark", { description: msg });
           return;
         }
+        const title = String(formData.get("title") ?? "").trim();
+        toast.success(bookmark ? "Bookmark updated" : "Bookmark added", {
+          description: title || undefined,
+        });
         router.refresh();
         onSaved();
       } catch {
         setError("Unable to save bookmark. Please try again.");
+        toast.error("Could not save bookmark", { description: "Please try again." });
       }
     });
   };
@@ -61,7 +69,7 @@ export function BookmarkForm({ collections, bookmark, defaultCollectionId, onSav
       </label>
       {error && <p role="alert" className="text-sm text-ctp-red">{error}</p>}
       <div className="flex justify-end pt-2">
-        <button type="submit" disabled={pending} className="min-h-11 bg-ctp-mauve px-5 text-sm font-semibold text-ctp-base hover:bg-ctp-lavender disabled:opacity-60">
+        <button type="submit" disabled={pending} className="min-h-11 rounded-md bg-ctp-mauve px-5 text-sm font-semibold text-ctp-base hover:bg-ctp-lavender disabled:opacity-60">
           {pending ? "Saving…" : bookmark ? "Save changes" : "Add bookmark"}
         </button>
       </div>

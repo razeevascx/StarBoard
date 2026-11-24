@@ -14,6 +14,12 @@
   --color-ctp-mauve: #cba6f7;
   --color-ctp-blue: #89b4fa;
   --color-ctp-lavender: #b4befe;
+  --color-ctp-green: #a6e3a1;
+  --color-ctp-peach: #fab387;
+  --color-ctp-yellow: #f9e2af;
+  --color-ctp-teal: #94e2d5;
+  --color-ctp-pink: #f5c2e7;
+  --color-ctp-maroon: #eba0ac;
 }
 
 @theme inline {
@@ -43,6 +49,9 @@
   --muted: #a6adc8;
   --accent: #cba6f7;
   --accent-blue: #89b4fa;
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --muted-foreground: var(--muted);
 }
 
 @layer base {
@@ -65,4 +74,42 @@
   summary::-webkit-details-marker {
     display: none;
   }
+}
+
+@utility surface-raised {
+  border-width: 1px;
+  border-color: transparent;
+  background:
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--surface-color, var(--surface)) 96%, var(--color-ctp-surface0)),
+      var(--surface-bottom, var(--surface))
+    ) padding-box,
+    linear-gradient(
+      to bottom,
+      var(--surface-stroke-top, color-mix(in srgb, var(--border) 85%, var(--color-ctp-lavender))),
+      var(--surface-stroke-bottom, color-mix(in srgb, var(--border) 55%, transparent))
+    ) border-box;
+  box-shadow: 0 1px 2px rgb(17 17 27 / 0.35), 0 8px 24px -8px rgb(17 17 27 / 0.55);
+}
+
+@utility typography-section-title {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: var(--foreground);
+}
+
+@utility typography-subsection-title {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+@utility typography-body {
+  font-size: 1rem;
+  line-height: 1.75rem;
+  color: var(--muted-foreground);
 }

@@ -1,15 +1,18 @@
 import type { Metadata } from "next";
+
 import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/HeroSection";
 import { FeaturesSection } from "@/components/FeaturesSection";
+import { McpShowcaseSection } from "@/components/McpShowcaseSection";
 import { FAQSection } from "@/components/FAQSection";
 import { Footer } from "@/components/Footer";
+
 import { getSiteUrl } from "@/lib/site-url";
 
 const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  alternates: siteUrl ? { canonical: siteUrl.href } : undefined,
+  alternates: { canonical: siteUrl.href },
 };
 
 export default function Home() {
@@ -19,6 +22,7 @@ export default function Home() {
       <main id="main" tabIndex={-1}>
         <HeroSection />
         <FeaturesSection />
+        <McpShowcaseSection />
         <FAQSection />
       </main>
       <Footer />

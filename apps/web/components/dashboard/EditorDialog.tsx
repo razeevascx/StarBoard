@@ -1,29 +1,102 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useId, useRef, type ReactNode } from "react";
 import { X } from "lucide-react";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/hangry-ui/components/card";
 
-export function EditorDialog({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
+export function EditorDialog({
+  title,
+  onClose,
+  children,
+}: {
+  title: string;
+  onClose: () => void;
+  children: ReactNode;
+}) {
+  const titleId = useId();
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const onCloseRef = useRef(onClose);
+
   useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    onCloseRef.current = onClose;
   }, [onClose]);
 
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    if (!dialog.open) dialog.showModal();
+
+    const handleClose = () => {
+      if (dialog.open) return;
+      dialog.returnValue = "";
+      onCloseRef.current();
+    };
+    dialog.addEventListener("close", handleClose);
+
+    let cleanupFallback: (() => void) | undefined;
+    if (!("closedBy" in HTMLDialogElement.prototype)) {
+      const outside = (e: PointerEvent) => {
+        const r = dialog.getBoundingClientRect();
+        return (
+          e.clientX < r.left ||
+          e.clientX > r.right ||
+          e.clientY < r.top ||
+          e.clientY > r.bottom
+        );
+      };
+      let pressedOutside = false;
+      const onPointerDown = (e: PointerEvent) => {
+        pressedOutside = outside(e);
+      };
+      const onPointerUp = (e: PointerEvent) => {
+        if (pressedOutside && outside(e)) dialog.close();
+      };
+      dialog.addEventListener("pointerdown", onPointerDown);
+      dialog.addEventListener("pointerup", onPointerUp);
+      cleanupFallback = () => {
+        dialog.removeEventListener("pointerdown", onPointerDown);
+        dialog.removeEventListener("pointerup", onPointerUp);
+      };
+    }
+
+    return () => {
+      dialog.removeEventListener("close", handleClose);
+      cleanupFallback?.();
+    };
+  }, []);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <button type="button" aria-label="Close dialog" className="absolute inset-0 bg-ctp-crust/75 backdrop-blur-sm" onClick={onClose} />
-      <div role="dialog" aria-modal="true" aria-label={title} className="relative z-10 max-h-[90vh] w-full max-w-lg overflow-y-auto border border-ctp-surface1 bg-ctp-mantle p-6 shadow-2xl">
-        <div className="mb-6 flex items-center justify-between gap-3">
-          <h2 className="text-xl font-semibold text-ctp-text">{title}</h2>
-          <button type="button" onClick={onClose} aria-label="Close dialog" className="p-2 text-ctp-subtext0 hover:bg-ctp-surface0 hover:text-ctp-text">
-            <X className="size-5" aria-hidden="true" />
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
+    <dialog
+      ref={dialogRef}
+      {...({ closedby: "any" } as Record<string, string>)}
+      aria-labelledby={titleId}
+      className="m-auto w-full max-w-lg overscroll-contain bg-transparent p-4 text-foreground backdrop:overflow-hidden backdrop:bg-ctp-crust/75 backdrop:overscroll-contain backdrop:backdrop-blur-sm"
+    >
+      <Card className="max-h-[90dvh] w-full max-w-none overflow-y-auto shadow-2xl">
+        <CardHeader className="items-center">
+          <CardTitle id={titleId} className="text-xl">
+            {title}
+          </CardTitle>
+          <CardAction>
+            <button
+              type="button"
+              onClick={() => dialogRef.current?.close()}
+              aria-label="Close dialog"
+              className="inline-flex size-9 items-center justify-center rounded-md text-ctp-subtext0 transition-colors hover:bg-ctp-surface0 hover:text-ctp-text"
+            >
+              <X className="size-5" aria-hidden="true" />
+            </button>
+          </CardAction>
+        </CardHeader>
+        <CardContent>{children}</CardContent>
+      </Card>
+    </dialog>
   );
 }

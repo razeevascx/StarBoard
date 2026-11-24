@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import { FolderCard } from "@/components/dashboard/FolderCard";
-import { SectionHeading } from "@/components/SectionHeading";
+import { BracketCard } from "@/components/hangry-ui/components/bracket-card";
 import { listCollections } from "@/lib/library";
 import { collectionColor } from "@/lib/collection-colors";
 
@@ -30,10 +30,12 @@ export default async function CollectionsPage() {
           ))}
         </ul>
       ) : (
-        <div className="mt-5 border border-dashed border-ctp-surface1 bg-ctp-mantle/30 px-6 py-16 text-center">
-          <h2 className="text-lg font-medium">No collections yet</h2>
-          <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-ctp-subtext0">Use the plus button to create a folder for a project, an interest, or links you want handy.</p>
-        </div>
+        <BracketCard variant="brackets" className="mt-5">
+          <div className="py-8 text-center">
+            <h2 className="text-lg font-medium">No collections yet</h2>
+            <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-muted-foreground">Use the plus button to create a folder for a project, an interest, or links you want handy.</p>
+          </div>
+        </BracketCard>
       )}
     </>
   );
