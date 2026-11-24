@@ -146,4 +146,33 @@ const handler = createMcpHandler((server) => {
 const authHandler = mcpAuthOptions
   ? withClerkMcpAuth(handler, mcpAuthOptions)
   : () => new Response(null, { status: 404 });
-export { authHandler as GET, authHandler as POST, authHandler as DELETE };
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers":
+    "Authorization, Content-Type, Mcp-Protocol-Version, Mcp-Method, Mcp-Name",
+  "Access-Control-Expose-Headers": "WWW-Authenticate",
+};
+
+async function corsAuthHandler(req: Request) {
+  const response = await authHandler(req);
+  const headers = new Headers(response.headers);
+  for (const [name, value] of Object.entries(corsHeaders)) headers.set(name, value);
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
+function preflight() {
+  return new Response(null, { status: 204, headers: corsHeaders });
+}
+
+export {
+  corsAuthHandler as GET,
+  corsAuthHandler as POST,
+  corsAuthHandler as DELETE,
+  preflight as OPTIONS,
+};

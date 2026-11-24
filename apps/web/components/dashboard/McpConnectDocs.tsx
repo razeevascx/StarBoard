@@ -131,6 +131,9 @@ const CLIENT_GUIDES: ClientGuide[] = [
             starboard: {
               type: "http",
               url: endpointUrl,
+              oauth: {
+                clientId: "TdtNnsU34oU9ZcMB",
+              },
             },
           },
         },

@@ -1,9 +1,10 @@
 import type { McpAuthOptions } from "@clerk/mcp-tools/next";
-import { getSiteUrl } from "@/lib/site-url";
 
-const resourceUrl = process.env.MCP_RESOURCE_URL?.trim() || new URL("/mcp", getSiteUrl()).href;
+const resourceUrl = process.env.MCP_RESOURCE_URL?.trim();
+if (!resourceUrl) throw new Error("MCP_RESOURCE_URL is not set");
 
 export const mcpAuthOptions = {
   resourceUrl,
   requiredScopes: ["profile"],
+  discoverable: false,
 } satisfies McpAuthOptions;
