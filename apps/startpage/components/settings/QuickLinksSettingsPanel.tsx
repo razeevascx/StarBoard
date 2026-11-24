@@ -1,6 +1,6 @@
 import { Pencil, Trash2, Plus, X } from 'lucide-react';
 import { ICON_MAP } from '../../lib/quicklinks';
-import { getFaviconUrl, getFallbackFaviconUrl } from '../../lib/favicon';
+import { getFaviconUrl, handleFaviconError } from '../../lib/favicon';
 import type { FormEvent } from 'react';
 
 type LinkItem = {
@@ -46,44 +46,44 @@ export default function QuickLinksSettingsPanel({
             placeholder="Name"
             value={newLink.name}
             onChange={(e) => onNewLinkChange({ ...newLink, name: e.target.value })}
-            className="flex-2 bg-ctp-surface0/30 border border-ctp-surface1/30 px-4 py-2 text-xs text-ctp-text focus:outline-none focus:border-ctp-mauve transition-all"
+            className="rounded-md flex-2 bg-ctp-surface0/30 border border-ctp-surface1/30 px-4 py-2 text-xs text-ctp-text focus:outline-none focus:border-ctp-mauve transition-all"
           />
           <input
             type="text"
             placeholder="URL (https://...)"
             value={newLink.url}
             onChange={(e) => onNewLinkChange({ ...newLink, url: e.target.value })}
-            className="flex-3 bg-ctp-surface0/30 border border-ctp-surface1/30 px-4 py-2 text-xs text-ctp-text focus:outline-none focus:border-ctp-mauve transition-all"
+            className="rounded-md flex-3 bg-ctp-surface0/30 border border-ctp-surface1/30 px-4 py-2 text-xs text-ctp-text focus:outline-none focus:border-ctp-mauve transition-all"
           />
-          <button type="submit" className="p-2 bg-ctp-mauve text-ctp-base hover:scale-105 active:scale-95 transition-all shadow-lg shadow-ctp-mauve/20">
+          <button type="submit" className="rounded-md p-2 bg-ctp-mauve text-ctp-base hover:scale-105 active:scale-95 transition-all shadow-lg shadow-ctp-mauve/20">
             <Plus className="w-5 h-5" />
           </button>
         </form>
 
         <div className="grid grid-cols-1 gap-2">
           {quickLinks.map((link) => (
-            <div key={link.id} className="flex items-center justify-between p-3 bg-ctp-surface0/20 border border-ctp-surface1/20 group hover:border-ctp-surface1/50 transition-all">
+            <div key={link.id} className="rounded-md flex items-center justify-between p-3 bg-ctp-surface0/20 border border-ctp-surface1/20 group hover:border-ctp-surface1/50 transition-all">
               {editingId === link.id ? (
                 <form onSubmit={onUpdate} className="flex flex-1 gap-2 items-center">
                   <input
                     type="text"
                     value={editForm.name}
                     onChange={(e) => onEditFormChange({ ...editForm, name: e.target.value })}
-                    className="flex-2 bg-ctp-surface0/50 border border-ctp-mauve/30 px-3 py-1 text-xs text-ctp-text focus:outline-none"
+                    className="rounded-md flex-2 bg-ctp-surface0/50 border border-ctp-mauve/30 px-3 py-1 text-xs text-ctp-text focus:outline-none"
                     autoFocus
                   />
                   <input
                     type="text"
                     value={editForm.url}
                     onChange={(e) => onEditFormChange({ ...editForm, url: e.target.value })}
-                    className="flex-3 bg-ctp-surface0/50 border border-ctp-mauve/30 px-3 py-1 text-xs text-ctp-text focus:outline-none"
+                    className="rounded-md flex-3 bg-ctp-surface0/50 border border-ctp-mauve/30 px-3 py-1 text-xs text-ctp-text focus:outline-none"
                   />
-                  <button type="submit" className="text-ctp-green hover:scale-110 transition-transform">
+                  <button type="submit" className="rounded-md text-ctp-green hover:scale-110 transition-transform">
                     <Plus className="w-4 h-4" />
                   </button>
                   <button
                   type="button"
-                  onClick={onCancelEditing} className="text-ctp-red hover:scale-110 transition-transform">
+                  onClick={onCancelEditing} className="rounded-md text-ctp-red hover:scale-110 transition-transform">
                     <X className="w-4 h-4" />
                   </button>
                 </form>
@@ -100,7 +100,7 @@ export default function QuickLinksSettingsPanel({
                         return (
                           <img
                             src={getFaviconUrl(link.url)}
-                            onError={(e) => (e.currentTarget.src = getFallbackFaviconUrl(link.url))}
+                            onError={handleFaviconError}
                             alt=""
                             className="w-4 h-4 object-contain"
                           />
@@ -113,10 +113,10 @@ export default function QuickLinksSettingsPanel({
                     </div>
                   </div>
                   <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => onStartEditing(link)} className="p-1.5 text-ctp-overlay1 hover:text-ctp-blue transition-colors">
+                    <button onClick={() => onStartEditing(link)} className="rounded-md p-1.5 text-ctp-overlay1 hover:text-ctp-blue transition-colors">
                       <Pencil className="w-4 h-4" />
                     </button>
-                    <button onClick={() => onRemoveQuickLink(link.id)} className="p-1.5 text-ctp-overlay1 hover:text-ctp-red transition-colors">
+                    <button onClick={() => onRemoveQuickLink(link.id)} className="rounded-md p-1.5 text-ctp-overlay1 hover:text-ctp-red transition-colors">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>

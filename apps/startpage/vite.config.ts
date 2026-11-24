@@ -10,38 +10,40 @@ export default defineConfig(({ mode }) => {
   const browserTarget =
     mode === "firefox" || mode === "safari" ? mode : "chrome";
   const outDir = browserTarget === "chrome" ? "dist" : `dist-${browserTarget}`;
-  const env = loadEnv(mode, import.meta.dirname, "VITE_");
+  const env = loadEnv(browserTarget === "chrome" ? mode : "production", import.meta.dirname, "VITE_");
   const webEnv = loadEnv(
     mode,
     resolve(import.meta.dirname, "../web"),
     "NEXT_PUBLIC_",
   );
-  const vercelHost =
-    process.env.VERCEL_ENV === "production"
-      ? process.env.VERCEL_PROJECT_PRODUCTION_URL
-      : process.env.VERCEL_URL;
+  const vercelHost = process.env.VERCEL_PROJECT_PRODUCTION_URL;
   const webUrl =
     process.env.VITE_WEB_URL ||
     env.VITE_WEB_URL ||
-    (vercelHost ? `https://${vercelHost}` : "http://localhost:3000");
+    (mode === "development"
+      ? "http://localhost:3000"
+      : vercelHost ? `https://${vercelHost}` : "https://starboard.razeev.com");
   const hosts = new Set([`${new URL(webUrl).origin}/*`]);
   const key =
     process.env.VITE_CLERK_PUBLISHABLE_KEY ||
     env.VITE_CLERK_PUBLISHABLE_KEY ||
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ||
     webEnv.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  let clerkSyncHost = process.env.VITE_CLERK_SYNC_HOST || env.VITE_CLERK_SYNC_HOST || "";
   if (key) {
     const encoded = key.replace(/^pk_(test|live)_/, "");
     const frontendHost = Buffer.from(encoded, "base64")
       .toString("utf8")
       .replace(/\$$/, "");
-    hosts.add(`${new URL(`https://${frontendHost}`).origin}/*`);
+    clerkSyncHost = new URL(`https://${frontendHost}`).origin;
+    hosts.add(`${clerkSyncHost}/*`);
   }
 
   return {
     base: "./",
     define: {
       "import.meta.env.VITE_CLERK_PUBLISHABLE_KEY": JSON.stringify(key || ""),
+      "import.meta.env.VITE_CLERK_SYNC_HOST": JSON.stringify(clerkSyncHost),
       "import.meta.env.VITE_WEB_URL": JSON.stringify(webUrl),
     },
     plugins: [

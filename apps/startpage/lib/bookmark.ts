@@ -1,5 +1,7 @@
 import { extensionApi, supportsBookmarkAccess } from "./browser";
 
+const ACTIVE_FOLDER_KEY = "startpage-active-bookmark-folder";
+
 export interface FolderItem {
   id: string;
   title: string;
@@ -39,6 +41,19 @@ export function getBookmarksBar(tree: chrome.bookmarks.BookmarkTreeNode[]) {
     folders.find((child) => child.id === "1" || child.id === "toolbar_____") ??
     folders.find((child) => /bar|toolbar/i.test(child.title))
   );
+}
+
+export function getBookmarkFolders(tree: chrome.bookmarks.BookmarkTreeNode[]): FolderItem[] {
+  const folders: FolderItem[] = [];
+  function visit(nodes: chrome.bookmarks.BookmarkTreeNode[]) {
+    for (const node of nodes) {
+      if (node.url || node.unmodifiable) continue;
+      folders.push({ id: node.id, title: node.title });
+      visit(node.children ?? []);
+    }
+  }
+  visit(tree[0]?.children ?? []);
+  return folders;
 }
 
 export function getOtherBookmarks(tree: chrome.bookmarks.BookmarkTreeNode[]) {
@@ -103,6 +118,12 @@ export function getInitialFolderId(
   folders: FolderItem[],
   bookmarksBar?: chrome.bookmarks.BookmarkTreeNode,
 ) {
+  try {
+    const saved = globalThis.localStorage?.getItem(ACTIVE_FOLDER_KEY);
+    if (saved && folders.some((folder) => folder.id === saved && (folder.count ?? 0) > 0)) return saved;
+  } catch {
+    // Browsing still works when persistent storage is unavailable.
+  }
   return folders.length > 0 ? folders[0].id : bookmarksBar?.id || "1";
 }
 
@@ -146,6 +167,11 @@ export function selectBookmarkFolder(
   setBrowserBookmarks: (bookmarks: chrome.bookmarks.BookmarkTreeNode[]) => void,
   onError?: (error: string) => void,
 ) {
+  try {
+    globalThis.localStorage?.setItem(ACTIVE_FOLDER_KEY, folderId);
+  } catch {
+    // Storage failures must not prevent switching folders.
+  }
   setActiveFolderId(folderId);
   fetchFolderContents(folderId, setBrowserBookmarks, onError);
 }

@@ -63,9 +63,9 @@ export default function About() {
         {features.map(({ icon: Icon, title, description }) => (
           <div
             key={title}
-            className="flex items-start gap-3 p-3  bg-ctp-surface0/40  transition-colors hover:bg-ctp-surface0/70"
+            className="rounded-md flex items-start gap-3 p-3  bg-ctp-surface0/40  transition-colors hover:bg-ctp-surface0/70"
           >
-            <div className="shrink-0 flex items-center justify-center size-8 bg-ctp-surface1/60 text-ctp-mauve">
+            <div className="rounded-md shrink-0 flex items-center justify-center size-8 bg-ctp-surface1/60 text-ctp-mauve">
               <Icon className="w-4 h-4" strokeWidth={2} />
             </div>
             <div className="min-w-0">

@@ -1,4 +1,4 @@
-import { cn } from '../lib/cn';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './hangry-ui/components/tabs';
 import { Folder } from 'lucide-react';
 import { memo } from 'react';
 import type { FolderItem, BookmarkLink } from '../lib/bookmark';
@@ -12,6 +12,8 @@ interface BookmarkManagerProps {
   layout: "cards" | "list";
   columns: 2 | 3 | 4;
   folderNavigation: "bottom" | "sidebar";
+  sidebarOpen: boolean;
+  onSidebarToggle: () => void;
 }
 
 const BookmarkManager = memo(function BookmarkManager({
@@ -22,61 +24,72 @@ const BookmarkManager = memo(function BookmarkManager({
   layout,
   columns,
   folderNavigation,
+  sidebarOpen,
+  onSidebarToggle,
 }: BookmarkManagerProps) {
 
-  const folderButtons = folders
-    .filter((folder) => (folder.count ?? 0) > 0)
-    .map((folder) => (
-      <button
-        key={folder.id}
-        onClick={() => onFolderSelect(folder.id)}
-        aria-pressed={activeFolderId === folder.id}
-        className={cn(
-          "flex items-center gap-2 border border-transparent px-4 py-2 text-xs font-black tracking-wide transition-all whitespace-nowrap hover:scale-110 hover:border-ctp-mauve/50 hover:shadow-2xl",
-          activeFolderId === folder.id
-            ? "bg-ctp-mauve text-ctp-base"
-            : "text-ctp-subtext0 hover:bg-ctp-surface0/40 hover:text-ctp-text",
-        )}
-      >
-        <Folder className="size-3.5 shrink-0" aria-hidden="true" />
-        {folder.title}
-      </button>
-    ));
+  const visibleFolders = folders.filter((folder) => (folder.count ?? 0) > 0);
+  const folderButtons = visibleFolders.map((folder) => (
+    <TabsTrigger
+      key={folder.id}
+      value={folder.id}
+      onKeyDown={(event) => {
+        if (folderNavigation === 'sidebar' && event.key === 'Escape') {
+          event.preventDefault();
+          onSidebarToggle();
+          document.getElementById('bookmark-sidebar-toggle')?.focus();
+        }
+      }}
+      className="min-w-0 shrink-0 flex-none gap-2 px-3 py-2 text-xs font-black tracking-wide"
+    >
+      <Folder className="size-3.5 shrink-0" aria-hidden="true" />
+      <span className="min-w-0 max-w-64 truncate" title={folder.title}>{folder.title}</span>
+    </TabsTrigger>
+  ));
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-12">
-      {/* Navigation Tabs */}
-
-      {/* Content Area */}
-      <div className="min-h-100">
-          <QuickLinks links={bookmarkLinks} layout={layout} columns={columns} />
+    <Tabs
+      value={activeFolderId ?? ''}
+      onValueChange={onFolderSelect}
+      orientation={folderNavigation === 'sidebar' ? 'vertical' : 'horizontal'}
+      className="mx-auto w-full max-w-6xl"
+    >
+      <div className={folderNavigation === "bottom" ? "min-w-0 w-full pb-16" : "min-w-0 w-full"}>
+        {visibleFolders.map((folder) => (
+          <TabsContent key={folder.id} value={folder.id}>
+            {activeFolderId === folder.id && <QuickLinks links={bookmarkLinks} layout={layout} columns={columns} />}
+          </TabsContent>
+        ))}
+        {!visibleFolders.some((folder) => folder.id === activeFolderId) && <QuickLinks links={bookmarkLinks} layout={layout} columns={columns} />}
       </div>
 
       {folderNavigation === "sidebar" ? (
-        <aside className="fixed inset-y-0 left-0 z-60 flex w-44 flex-col border-r border-ctp-surface1/30 bg-ctp-mantle/80 backdrop-blur-xl md:w-56">
-          <div className="flex h-16 shrink-0 items-center border-b border-ctp-surface1/30 px-5">
-            <img
-              src="favicon.svg"
-              alt="Starboard"
-              className="size-9"
-            />
-          </div>
-          <div className="m-3 flex flex-1 flex-col gap-1 overflow-y-auto no-scrollbar bg-ctp-surface0/50 p-1">
-            {folderButtons}
+        <aside
+          id="bookmark-sidebar"
+          aria-label="Bookmark sidebar"
+          hidden={!sidebarOpen}
+
+          className="fixed top-16 left-0 z-60 flex h-[calc(100dvh-4rem)] min-h-0 w-44 flex-col overflow-hidden  backdrop-blur-xl hidden:hidden md:w-56"
+        >
+
+          <div className="min-h-0 flex-1 overflow-y-auto p-3">
+            <TabsList aria-label="Bookmark folders" className="w-full items-stretch justify-start gap-1 p-1">
+              {folderButtons}
+            </TabsList>
           </div>
         </aside>
       ) : (
         <div className="fixed bottom-0 left-0 z-50 w-full border-t border-ctp-surface1/30 bg-ctp-mantle/30 backdrop-blur-xl">
           <div className="mx-auto max-w-6xl">
             <div className="flex items-center justify-center">
-              <div className="flex overflow-x-auto no-scrollbar bg-ctp-surface0/50 p-1 text-md">
+              <TabsList aria-label="Bookmark folders" className="max-w-full justify-start overflow-x-auto no-scrollbar p-1">
                 {folderButtons}
-              </div>
+              </TabsList>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </Tabs>
   );
 });
 

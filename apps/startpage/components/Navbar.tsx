@@ -1,14 +1,17 @@
 import { GitHubDark } from '@ridemountainpig/svgl-react';
-import { Settings } from 'lucide-react';
+import { PanelLeftClose, PanelLeftOpen, Settings } from 'lucide-react';
 import { cn } from '../lib/cn';
 import { memo } from 'react';
 import Box from './Box';
 import { ICON_MAP } from '../lib/quicklinks';
 import type { LinkItem } from '../lib/quicklinks';
-import { getFaviconUrl, getFallbackFaviconUrl } from '../lib/favicon';
+import { getFaviconUrl, handleFaviconError } from '../lib/favicon';
 
 interface NavbarProps {
   className?: string;
+  showSidebarToggle?: boolean;
+  sidebarOpen?: boolean;
+  onSidebarToggle?: () => void;
   onSettingsClick?: () => void;
   onHomeClick?: () => void;
   quickLinks?: LinkItem[];
@@ -16,31 +19,37 @@ interface NavbarProps {
 
 const Navbar = memo(function Navbar({
   className,
+  showSidebarToggle,
+  sidebarOpen,
+  onSidebarToggle,
   onSettingsClick,
   onHomeClick,
   quickLinks = [],
 }: Readonly<NavbarProps>) {
   return (
+    <>
     <nav
       className={cn(
-        "fixed top-0 left-0 w-full h-16 z-50 px-8 flex items-center justify-between g-ctp-mantle/30 backdrop-blur-xl ",
+        "fixed top-0 left-0 w-full h-16 z-50 px-8 flex items-center justify-between bg-ctp-mantle/30 backdrop-blur-xl ",
         className,
       )}
     >
-      <Box className="flex items-center justify-between w-full">
-        <div className="flex items-center space-x-6 group cursor-default max-w-[85%] overflow-x-auto custom-scrollbar">
-          <button
-            onClick={onHomeClick}
-            className="flex items-center space-x-3 size-10 group/brand transition-all hover:opacity-80 shrink-0"
-          >
-              <img
-                src="favicon.svg"
-                alt="Starboard logo"
-                className="w-full h-full"
-              />
-          </button>
-        </div>
-
+      <Box className="flex w-full items-center justify-between">
+        <button
+        id="bookmark-sidebar-toggle"
+        type="button"
+        onClick={showSidebarToggle ? onSidebarToggle : onHomeClick}
+        aria-label={showSidebarToggle ? (sidebarOpen ? 'Close bookmark sidebar' : 'Open bookmark sidebar') : 'Starboard home'}
+        aria-expanded={showSidebarToggle ? sidebarOpen : undefined}
+        aria-controls={showSidebarToggle ? 'bookmark-sidebar' : undefined}
+        title={showSidebarToggle ? (sidebarOpen ? 'Close bookmark sidebar' : 'Open bookmark sidebar') : 'Starboard home'}
+        className="group/brand relative flex size-10 shrink-0 items-center justify-center rounded-md text-ctp-mauve hover:bg-ctp-surface0 focus-visible:outline-2 focus-visible:outline-ctp-mauve"
+      >
+        <img src="favicon.svg" alt="" className={cn('size-9', showSidebarToggle && 'group-hover/brand:opacity-0 group-focus-visible/brand:opacity-0')} />
+        {showSidebarToggle && (sidebarOpen
+          ? <PanelLeftClose aria-hidden="true" className="absolute size-5 opacity-0 group-hover/brand:opacity-100 group-focus-visible/brand:opacity-100" />
+          : <PanelLeftOpen aria-hidden="true" className="absolute size-5 opacity-0 group-hover/brand:opacity-100 group-focus-visible/brand:opacity-100" />)}
+      </button>
         <div className="flex items-center space-x-6 shrink-0">
           {quickLinks.map((link) => {
             const Icon = link.iconId ? ICON_MAP[link.iconId] : null;
@@ -60,11 +69,7 @@ const Navbar = memo(function Navbar({
                   ) : (
                     <img
                       src={getFaviconUrl(link.url ?? "")}
-                      onError={(e) =>
-                        (e.currentTarget.src = getFallbackFaviconUrl(
-                          link.url ?? "",
-                        ))
-                      }
+                      onError={handleFaviconError}
                       alt=""
                       className="w-full h-full object-contain"
                     />
@@ -97,6 +102,7 @@ const Navbar = memo(function Navbar({
         </div>
       </Box>
     </nav>
+    </>
   );
 });
 

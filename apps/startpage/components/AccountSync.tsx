@@ -2,29 +2,55 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth, useClerk, useUser } from '@clerk/chrome-extension';
 import { ArrowUpRight, Check, CloudUpload, LogOut, RefreshCw, ShieldCheck, UserRound } from 'lucide-react';
 import { readSyncBookmarks, uploadBookmarks } from '../lib/bookmark-sync';
-import { extensionApi, supportsBookmarkAccess } from '../lib/browser';
+import { extensionApi, extensionUrl, supportsBookmarkAccess } from '../lib/browser';
 
 const webUrl = (import.meta.env.VITE_WEB_URL || 'https://starboard.razeev.com').replace(/\/$/, '');
 
 export default function AccountSync() {
-  const { isLoaded, isSignedIn, userId, getToken } = useAuth();
+  const { isLoaded, isSignedIn, userId, sessionId, getToken } = useAuth();
   const { user } = useUser();
   const clerk = useClerk();
+  const [signingIn, setSigningIn] = useState(false);
+  const [signInError, setSignInError] = useState('');
+  const [signingOut, setSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState('');
   const [hasPermission, setHasPermission] = useState(false);
   const [status, setStatus] = useState('');
   const [syncState, setSyncState] = useState<'idle' | 'syncing' | 'success' | 'error'>('idle');
   const [syncedCount, setSyncedCount] = useState<number | null>(null);
   const syncing = useRef(false);
   const autoSyncedForUser = useRef<string | null>(null);
-  const signInRequested = useRef(false);
+
   const canSyncBookmarks = supportsBookmarkAccess();
 
-  useEffect(() => {
-    if (!isLoaded || isSignedIn || signInRequested.current || new URLSearchParams(window.location.search).get('sign-in') !== '1') return;
-    signInRequested.current = true;
-    window.history.replaceState(null, '', window.location.pathname + '?settings=account');
-    clerk.openSignIn();
-  }, [clerk, isLoaded, isSignedIn]);
+  async function signInWithGoogle() {
+    if (!extensionUrl || signingIn) return;
+    setSigningIn(true);
+    setSignInError('');
+    try {
+      const signInUrl = new URL(`${webUrl}/sign-in`);
+      signInUrl.searchParams.set('redirect_url', `${webUrl}/dashboard/bookmarks`);
+      await extensionApi?.tabs?.create({ url: signInUrl.toString() });
+    } catch {
+      setSignInError('Unable to open Starboard sign-in. Please try again.');
+      setSigningIn(false);
+    }
+  }
+
+  async function signOut() {
+    if (signingOut) return;
+    setSigningOut(true);
+    setSignOutError('');
+    try {
+      await clerk.signOut({
+        ...(sessionId ? { sessionId } : {}),
+        redirectUrl: `${extensionUrl}?settings=account`,
+      });
+    } catch (error) {
+      setSignOutError(error instanceof Error ? error.message : 'Unable to sign out. Please try again.');
+      setSigningOut(false);
+    }
+  }
 
   const sync = useCallback(async () => {
     if (!userId || syncing.current) return;
@@ -84,13 +110,13 @@ export default function AccountSync() {
   return (
     <section aria-label="Account settings" className="space-y-4 text-sm text-ctp-text">
       {!isLoaded ? (
-        <div className="border border-ctp-surface1/50 bg-ctp-surface0/30 p-6" role="status">Loading your account…</div>
+        <div className="rounded-md border border-ctp-surface1/50 bg-ctp-surface0/30 p-6" role="status">Loading your account…</div>
       ) : isSignedIn ? (
         <>
-          <div className="border border-ctp-surface1/50 bg-gradient-to-br from-ctp-surface0/70 to-ctp-mantle p-5 sm:p-6">
+          <div className="rounded-md border border-ctp-surface1/50 bg-gradient-to-br from-ctp-surface0/70 to-ctp-mantle p-5 sm:p-6">
             <div className="mb-5 flex items-center justify-between gap-3">
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-ctp-overlay1">Your account</p>
-              <span className="inline-flex items-center gap-1.5 border border-ctp-green/30 bg-ctp-green/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-ctp-green"><Check className="size-3" aria-hidden="true" /> Connected</span>
+              <span className="rounded-md inline-flex items-center gap-1.5 border border-ctp-green/30 bg-ctp-green/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-ctp-green"><Check className="size-3" aria-hidden="true" /> Connected</span>
             </div>
             <div className="flex min-w-0 flex-wrap items-center gap-4">
               {user?.imageUrl ? (
@@ -106,14 +132,15 @@ export default function AccountSync() {
               </div>
             </div>
             <div className="mt-6 flex flex-wrap gap-2 border-t border-ctp-surface1/40 pt-5">
-              <button type="button" onClick={() => clerk.openUserProfile()} className="min-h-10 border border-ctp-surface1 bg-ctp-base/40 px-4 text-xs font-bold text-ctp-text transition-colors hover:border-ctp-mauve hover:text-ctp-mauve">Manage profile</button>
-              <button type="button" onClick={() => void clerk.signOut()} className="inline-flex min-h-10 items-center gap-2 px-3 text-xs font-semibold text-ctp-subtext0 transition-colors hover:text-ctp-red"><LogOut className="size-4" aria-hidden="true" /> Sign out</button>
+              <button type="button" onClick={() => clerk.openUserProfile()} className="rounded-md min-h-10 border border-ctp-surface1 bg-ctp-base/40 px-4 text-xs font-bold text-ctp-text transition-colors hover:border-ctp-mauve hover:text-ctp-mauve">Manage profile</button>
+              <button type="button" onClick={() => void signOut()} disabled={signingOut} className="rounded-md inline-flex min-h-10 items-center gap-2 px-3 text-xs font-semibold text-ctp-subtext0 transition-colors hover:text-ctp-red disabled:cursor-wait disabled:opacity-60"><LogOut className="size-4" aria-hidden="true" /> {signingOut ? 'Signing out…' : 'Sign out'}</button>
             </div>
+            {signOutError && <p role="alert" className="mt-3 text-xs text-ctp-red">{signOutError}</p>}
           </div>
 
-          <div className="border border-ctp-surface1/50 bg-ctp-surface0/20 p-5 sm:p-6">
+          <div className="rounded-md border border-ctp-surface1/50 bg-ctp-surface0/20 p-5 sm:p-6">
             <div className="flex items-start gap-3">
-              <div className="flex size-10 shrink-0 items-center justify-center bg-ctp-mauve/15 text-ctp-mauve"><CloudUpload className="size-5" aria-hidden="true" /></div>
+              <div className="rounded-md flex size-10 shrink-0 items-center justify-center bg-ctp-mauve/15 text-ctp-mauve"><CloudUpload className="size-5" aria-hidden="true" /></div>
               <div className="min-w-0 flex-1">
                 <h4 className="text-base font-bold">Bookmark sync</h4>
                 <p className="mt-1 text-xs leading-5 text-ctp-subtext0">{canSyncBookmarks ? 'Keep your browser bookmarks available in your Starboard dashboard.' : 'This browser does not provide access to bookmarks. You can still manage bookmarks in your web dashboard.'}</p>
@@ -125,7 +152,7 @@ export default function AccountSync() {
               <span className={hasPermission ? 'font-bold text-ctp-green' : 'font-bold text-ctp-yellow'}>{!canSyncBookmarks ? 'Unavailable' : hasPermission ? 'Enabled' : 'Needed'}</span>
             </div>
             <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-              <button type="button" disabled={!canSyncBookmarks || syncState === 'syncing'} onClick={hasPermission ? () => void sync() : enableSync} className="inline-flex min-h-10 items-center gap-2 bg-ctp-mauve px-4 text-xs font-bold text-ctp-base transition-colors hover:bg-ctp-lavender disabled:cursor-not-allowed disabled:opacity-60">
+              <button type="button" disabled={!canSyncBookmarks || syncState === 'syncing'} onClick={hasPermission ? () => void sync() : enableSync} className="rounded-md inline-flex min-h-10 items-center gap-2 bg-ctp-mauve px-4 text-xs font-bold text-ctp-base transition-colors hover:bg-ctp-lavender disabled:cursor-not-allowed disabled:opacity-60">
                 <RefreshCw className={syncState === 'syncing' ? 'size-4 animate-spin' : 'size-4'} aria-hidden="true" />
                 {!canSyncBookmarks ? 'Bookmark sync unavailable' : syncState === 'syncing' ? 'Syncing…' : hasPermission ? 'Sync bookmarks' : 'Enable sync'}
               </button>
@@ -136,16 +163,20 @@ export default function AccountSync() {
             </p>}
           </div>
 
-          <a href={webUrl + '/dashboard/bookmarks'} target="_blank" rel="noopener noreferrer" className="flex min-h-12 items-center justify-between gap-3 border border-ctp-surface1/50 bg-ctp-surface0/20 px-5 text-xs font-bold text-ctp-mauve transition-colors hover:border-ctp-mauve/50 hover:bg-ctp-surface0/40">
+          <a href={webUrl + '/dashboard/bookmarks'} target="_blank" rel="noopener noreferrer" className="rounded-md flex min-h-12 items-center justify-between gap-3 border border-ctp-surface1/50 bg-ctp-surface0/20 px-5 text-xs font-bold text-ctp-mauve transition-colors hover:border-ctp-mauve/50 hover:bg-ctp-surface0/40">
             View bookmarks dashboard <ArrowUpRight className="size-4" aria-hidden="true" />
           </a>
         </>
       ) : (
-        <div className="border border-ctp-surface1/50 bg-gradient-to-br from-ctp-surface0/70 to-ctp-mantle p-6">
-          <div className="mb-5 flex size-14 items-center justify-center bg-ctp-mauve/15 text-ctp-mauve"><UserRound className="size-7" aria-hidden="true" /></div>
+        <div className="rounded-md border border-ctp-surface1/50 bg-gradient-to-br from-ctp-surface0/70 to-ctp-mantle p-6">
+          <div className="rounded-md mb-5 flex size-14 items-center justify-center bg-ctp-mauve/15 text-ctp-mauve"><UserRound className="size-7" aria-hidden="true" /></div>
           <h3 className="text-xl font-bold tracking-tight">Bring your bookmarks with you</h3>
           <p className="mt-2 max-w-md text-sm leading-6 text-ctp-subtext0">Sign in to back up browser bookmarks and find them in your web dashboard. Sync starts after you grant bookmark access.</p>
-          <button type="button" onClick={() => clerk.openSignIn()} className="mt-6 min-h-11 bg-ctp-mauve px-5 text-xs font-bold text-ctp-base transition-colors hover:bg-ctp-lavender">Sign in to Starboard</button>
+          <button type="button" onClick={() => void signInWithGoogle()} disabled={signingIn} className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-md bg-ctp-mauve px-5 text-xs font-bold text-ctp-base transition-colors hover:bg-ctp-lavender focus-visible:outline-2 focus-visible:outline-ctp-mauve disabled:opacity-60">
+            <UserRound className="size-4" aria-hidden="true" />
+            {signingIn ? 'Opening Starboard…' : 'Continue with Google'}
+          </button>
+          {signInError && <p role="alert" className="mt-3 text-xs text-ctp-red">{signInError}</p>}
         </div>
       )}
     </section>

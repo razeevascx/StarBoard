@@ -77,18 +77,34 @@ export async function uploadBookmarks(
   token: string,
   webUrl: string,
 ) {
+  const target = new URL(webUrl).origin;
+  const extensionPage = extensionApi?.runtime?.id
+    ? new URL(extensionApi.runtime.getURL('index.html'))
+    : null;
+  const origin = extensionPage ? `${extensionPage.protocol}//${extensionPage.host}` : 'your extension origin';
   for (let offset = 0; offset < bookmarks.length; offset += 500) {
-    const response = await fetch(`${webUrl}/api/bookmarks/import`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        bookmarks: bookmarks.slice(offset, offset + 500),
-      }),
-    });
+    const batch = bookmarks.slice(offset, offset + 500);
+    let response: Response;
+    try {
+      response = await fetch(`${target}/api/bookmarks/import`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ bookmarks: batch }),
+      });
+    } catch {
+      throw new Error(`Cannot reach ${target}. Check your connection, reload the extension, and allow ${origin} in the web app's BOOKMARK_SYNC_ALLOWED_ORIGINS setting.`);
+    }
+    if (response.status === 401)
+      throw new Error('Sync authentication failed. Sign out and sign in again. The extension and dashboard must use the same Clerk instance.');
+    if (response.status === 403)
+      throw new Error(`Sync access denied. Add ${origin} to BOOKMARK_SYNC_ALLOWED_ORIGINS on ${target} and redeploy the web app. Use the public production domain if deployment protection is enabled.`);
+    const result = await response.json().catch(() => null);
     if (!response.ok)
-      throw new Error(`Bookmark upload failed (${response.status}).`);
+      throw new Error(typeof result?.error === 'string' ? `Bookmark upload failed (${response.status}): ${result.error}` : `Bookmark upload failed (${response.status}) at ${target}.`);
+    if (result?.imported !== batch.length)
+      throw new Error(`Unexpected sync response from ${target}. Use the public dashboard URL, not a protected preview or sign-in page.`);
   }
 }

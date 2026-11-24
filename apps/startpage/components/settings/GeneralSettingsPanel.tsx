@@ -40,7 +40,7 @@ export default function GeneralSettingsPanel({
                 disabled={isDisabled}
                 onClick={() => onToggleConfig(key, !value)}
                 className={cn(
-                  "flex items-center justify-between p-4 bg-ctp-surface0/30 border border-ctp-surface1/30 transition-all group",
+                  "rounded-md flex items-center justify-between p-4 bg-ctp-surface0/30 border border-ctp-surface1/30 transition-all group",
                   isDisabled ? "opacity-50 cursor-not-allowed grayscale" : "hover:bg-ctp-surface0/50"
                 )}
                 title={isDisabled ? "Bookmarks are not supported in this browser" : undefined}
@@ -48,8 +48,8 @@ export default function GeneralSettingsPanel({
                 <span className="text-xs font-bold text-ctp-subtext1 group-hover:text-ctp-text capitalize">
                   {getToggleLabel(key)}
                 </span>
-                <div className={cn("w-8 h-5 transition-colors flex items-center px-1", value ? "bg-ctp-mauve" : "bg-ctp-surface1")}>
-                  <div className={cn("w-3 h-3 bg-ctp-base shadow-sm transition-transform", value ? "translate-x-3" : "translate-x-0")} />
+                <div className={cn("rounded-md w-8 h-5 transition-colors flex items-center px-1", value ? "bg-ctp-mauve" : "bg-ctp-surface1")}>
+                  <div className={cn("rounded-md w-3 h-3 bg-ctp-base shadow-sm transition-transform", value ? "translate-x-3" : "translate-x-0")} />
                 </div>
               </button>
             );
@@ -72,7 +72,7 @@ export default function GeneralSettingsPanel({
                 onClick={() => onToggleConfig('bookmarkLayout', value as AppConfig['bookmarkLayout'])}
                 aria-pressed={isActive}
                 className={cn(
-                  "flex items-center justify-center gap-2 p-4 border transition-all",
+                  "rounded-md flex items-center justify-center gap-2 p-4 border transition-all",
                   isActive
                     ? "bg-ctp-mauve text-ctp-base border-ctp-mauve"
                     : "bg-ctp-surface0/30 border-ctp-surface1/30 text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text",
@@ -98,7 +98,7 @@ export default function GeneralSettingsPanel({
                 onClick={() => onToggleConfig('bookmarkColumns', columns)}
                 aria-pressed={isActive}
                 className={cn(
-                  "p-4 border text-xs font-bold uppercase tracking-widest transition-all",
+                  "rounded-md p-4 border text-xs font-bold uppercase tracking-widest transition-all",
                   isActive
                     ? "bg-ctp-mauve text-ctp-base border-ctp-mauve"
                     : "bg-ctp-surface0/30 border-ctp-surface1/30 text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text",
@@ -126,7 +126,7 @@ export default function GeneralSettingsPanel({
                 onClick={() => onToggleConfig('folderNavigation', value as AppConfig['folderNavigation'])}
                 aria-pressed={isActive}
                 className={cn(
-                  "flex items-center justify-center gap-2 p-4 border transition-all",
+                  "rounded-md flex items-center justify-center gap-2 p-4 border transition-all",
                   isActive
                     ? "bg-ctp-mauve text-ctp-base border-ctp-mauve"
                     : "bg-ctp-surface0/30 border-ctp-surface1/30 text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text",
@@ -144,7 +144,7 @@ export default function GeneralSettingsPanel({
         <h3 className="text-[10px] font-bold text-ctp-overlay1 uppercase tracking-[0.2em] mb-4">Browser Permissions</h3>
         <div className="space-y-3">
           <div className={cn(
-            "flex items-center justify-between p-4 bg-ctp-surface0/30 border border-ctp-surface1/30",
+            "rounded-md flex items-center justify-between p-4 bg-ctp-surface0/30 border border-ctp-surface1/30",
             !isBookmarkSupported && "opacity-50 grayscale cursor-not-allowed"
           )}>
             <div className="space-y-1">
@@ -160,7 +160,7 @@ export default function GeneralSettingsPanel({
               <button
                 disabled={!isBookmarkSupported}
                 onClick={() => onTogglePermission('bookmarks', false)}
-                className="px-4 py-2 bg-ctp-red/20 text-ctp-red text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-ctp-red/10 disabled:pointer-events-none"
+                className="rounded-md px-4 py-2 bg-ctp-red/20 text-ctp-red text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-ctp-red/10 disabled:pointer-events-none"
               >
                 Disable
               </button>
@@ -168,7 +168,7 @@ export default function GeneralSettingsPanel({
               <button
                 disabled={!isBookmarkSupported}
                 onClick={() => onTogglePermission('bookmarks', true)}
-                className="px-4 py-2 bg-ctp-mauve text-ctp-base text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-ctp-mauve/20 disabled:pointer-events-none"
+                className="rounded-md px-4 py-2 bg-ctp-mauve text-ctp-base text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-ctp-mauve/20 disabled:pointer-events-none"
               >
                 Enable
               </button>

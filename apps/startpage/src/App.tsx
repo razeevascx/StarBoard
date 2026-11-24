@@ -43,6 +43,7 @@ export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(() => new URLSearchParams(window.location.search).get('settings') === 'account');
   const [browserBookmarks, setBrowserBookmarks] = useState<chrome.bookmarks.BookmarkTreeNode[]>([]);
   const [topLevelFolders, setTopLevelFolders] = useState<FolderItem[]>([]);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
   const [quickLinks, setQuickLinks] = useState<LinkItem[]>(() => {
     return loadQuickLinks();
@@ -166,17 +167,22 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
+  const hasBookmarkSidebar = config.showBookmarks && config.folderNavigation === 'sidebar' && (hasPermission.bookmarks || topLevelFolders.length > 0);
+  const toggleSidebar = () => setSidebarOpen((open) => !open);
+
   return (
     <main
       className={cn(
         "min-h-screen text-ctp-text selection:bg-ctp-mauve/30 overflow-x-hidden pt-16 transition-all duration-700",
         config.bgType === "gradient" &&
           "from-ctp-mantle via-ctp-base to-ctp-base",
-        config.folderNavigation === "sidebar" && "pl-44 md:pl-56",
       )}
       style={backgroundStyle}
     >
       <Navbar
+        showSidebarToggle={hasBookmarkSidebar}
+        sidebarOpen={sidebarOpen}
+        onSidebarToggle={toggleSidebar}
         onSettingsClick={handleSettingsOpen}
         onHomeClick={handleHomeClick}
         quickLinks={quickLinks}
@@ -211,6 +217,8 @@ export default function App() {
             layout={config.bookmarkLayout}
             columns={config.bookmarkColumns}
             folderNavigation={config.folderNavigation}
+            sidebarOpen={sidebarOpen}
+            onSidebarToggle={toggleSidebar}
           />
         )}
       </Box>

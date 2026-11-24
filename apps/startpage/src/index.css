@@ -6,7 +6,20 @@
 */
 @import "@catppuccin/tailwindcss/mocha.css";
 
-
 body {
   @apply bg-ctp-base text-ctp-text;
+}
+
+@theme inline {
+  --color-foreground: var(--color-ctp-text);
+  --color-muted-foreground: var(--color-ctp-subtext0);
+  --color-muted: var(--color-ctp-surface0);
+  --color-secondary: var(--color-ctp-mauve);
+  --color-ring: var(--color-ctp-mauve);
+}
+
+@utility typography-body {
+  font-size: 1rem;
+  line-height: 1.75rem;
+  color: var(--color-ctp-subtext0);
 }

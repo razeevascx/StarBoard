@@ -1,7 +1,7 @@
 import { cn } from "../lib/cn";
 import { Folder } from "lucide-react";
 import { memo } from "react";
-import { getFallbackFaviconUrl, getFaviconUrl } from "../lib/favicon";
+import { handleFaviconError, getFaviconUrl } from "../lib/favicon";
 import { ICON_MAP } from "../lib/quicklinks";
 
 interface LinkItem {
@@ -51,7 +51,7 @@ const QuickLinks = memo(function QuickLinks({
               isList
                 ? "group flex items-center gap-4 px-4 py-5 text-left"
                 : "group flex size-30 flex-col items-center justify-center p-6",
-              "bg-ctp-surface0/20 backdrop-blur-md border border-ctp-surface1/40",
+              "rounded-md bg-ctp-surface0/20 backdrop-blur-md border border-ctp-surface1/40",
               "transition-all duration-500 hover:bg-ctp-surface0/40 hover:scale-110 hover:shadow-2xl hover:border-ctp-mauve/50",
             )}
             title={app.name}
@@ -71,7 +71,7 @@ const QuickLinks = memo(function QuickLinks({
               isList
                 ? "group flex items-center gap-4 px-4 py-5"
                 : "group flex flex-col items-center justify-center p-6",
-              "bg-ctp-surface0/20 backdrop-blur-md border border-ctp-surface1/40",
+              "rounded-md bg-ctp-surface0/20 backdrop-blur-md border border-ctp-surface1/40",
               "transition-all duration-500 hover:bg-ctp-surface0/40 hover:scale-110 hover:shadow-2xl hover:border-ctp-mauve/50",
             )}
             title={app.name}
@@ -84,11 +84,7 @@ const QuickLinks = memo(function QuickLinks({
                   src={getFaviconUrl(app.url ?? "")}
                   alt=""
                   className="w-full h-full object-contain"
-                  onError={(event) => {
-                    event.currentTarget.src = getFallbackFaviconUrl(
-                      app.url ?? "",
-                    );
-                  }}
+                  onError={handleFaviconError}
                 />
               )}
             </div>

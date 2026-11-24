@@ -140,10 +140,18 @@ Safari does not expose the WebExtensions bookmarks API, so browser bookmark acce
 
 ## Account sign-in and sync across browsers
 
-All targets use the same Clerk instance and `VITE_WEB_URL`. Configure your extension origin in Clerk’s allowed origins and enable its Native API before using extension sign-in. Add the exact origin to the web server’s comma-separated `BOOKMARK_SYNC_ALLOWED_ORIGINS`:
+All targets use the same Clerk instance and `VITE_WEB_URL`. Google sign-in opens the Starboard web sign-in page; the extension syncs the resulting Clerk session from the Clerk Frontend API host. Configure the extension origin in Clerk’s allowed origins and enable its Native API. Add the exact origin to the web server’s comma-separated `BOOKMARK_SYNC_ALLOWED_ORIGINS`:
 
 - Chrome: `chrome-extension://<extension-id>`; `VITE_EXTENSION_PUBLIC_KEY` stabilizes this ID.
 - Firefox: `moz-extension://<installation-uuid>`; this is an installation-specific UUID, not the manifest’s add-on ID.
 - Safari: `safari-web-extension://<installation-uuid>`.
 
-In the extension page’s developer console, `location.protocol + "//" + location.host` shows the origin to configure. Redirects use the browser’s own extension scheme. Production sync accepts only explicitly configured origins; development accepts Chrome IDs and Firefox/Safari UUID origins. Safari account sign-in opens the dashboard but cannot upload Safari’s native bookmarks.
+In the extension page’s developer console, `location.protocol + "//" + location.host` shows the origin to configure. Production sync accepts only explicitly configured origins; development accepts Chrome IDs and Firefox/Safari UUID origins. Safari account sign-in opens the dashboard but cannot upload Safari’s native bookmarks.
+
+### Sync with a deployed dashboard
+
+Release builds default to `https://starboard.razeev.com`; `bun run dev` defaults to `http://localhost:3000`. Override `VITE_WEB_URL` if you use another public production domain, then rebuild and reload the extension. The build adds that domain to its host permissions. Avoid Vercel preview URLs that require deployment authentication.
+
+On the web project's production environment, set `BOOKMARK_SYNC_ALLOWED_ORIGINS` to the exact installed extension origin (comma-separated for multiple installations) and redeploy the web app. Development's automatic extension-origin allowance does not apply in production. The extension and web deployment must also use the same Clerk instance. Sync errors display the required origin when access is denied.
+
+Release builds read `.env.production.local` for all browser targets. Set `VITE_CLERK_PUBLISHABLE_KEY` there to the production (`pk_live_`) publishable key used by the deployed web app. A development (`pk_test_`) session cannot authenticate against the production instance. After switching instances, reload the extension and sign in again; enable Clerk Native API and allow the extension origin in the production instance as well.

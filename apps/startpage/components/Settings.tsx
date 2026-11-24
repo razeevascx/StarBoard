@@ -6,6 +6,7 @@ import GeneralSettingsPanel from "./settings/GeneralSettingsPanel";
 import QuickLinksSettingsPanel from "./settings/QuickLinksSettingsPanel";
 import About from "./settings/About";
 import AccountSync from "./AccountSync";
+import { Tabs, TabsContent } from "./hangry-ui/components/tabs";
 import { extensionUrl } from "../lib/browser";
 
 interface LinkItem {
@@ -111,28 +112,30 @@ const Settings = memo(function Settings({
       <button
         type="button"
         aria-label="Close Settings"
-        className="absolute inset-0 bg-ctp-crust/40 backdrop-blur-sm animate-in fade-in duration-300"
+        className="rounded-md absolute inset-0 bg-ctp-crust/40 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={onClose}
       />
 
-      <div className="relative w-full max-w-2xl bg-ctp-mantle/80 backdrop-blur-2xl border border-ctp-surface1/50 shadow-2xl p-8 flex flex-col max-h-[85vh] animate-in zoom-in-95 fade-in duration-300">
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as Tab)} className="rounded-md relative w-full max-w-2xl bg-ctp-mantle/80 backdrop-blur-2xl border border-ctp-surface1/50 shadow-2xl p-8 flex flex-col max-h-[85vh] animate-in zoom-in-95 fade-in duration-300">
         <SettingsHeader
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
           onClose={onClose}
         />
 
-        <div className="flex-1 overflow-y-auto pr-2 space-y-6 custom-scrollbar">
-          {renderActiveTab()}
-          <div className={activeTab === "account" ? "" : "hidden"}>
+        <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {(['general', 'links', 'about'] as const).map((tab) => (
+            <TabsContent key={tab} value={tab}>
+              {activeTab === tab ? renderActiveTab() : null}
+            </TabsContent>
+          ))}
+          <TabsContent value="account">
             {import.meta.env.VITE_CLERK_PUBLISHABLE_KEY && extensionUrl ? (
               <AccountSync />
             ) : (
               <p className="text-sm text-ctp-subtext0">Account sign-in is available in the installed extension after its Clerk publishable key is configured.</p>
             )}
-          </div>
+          </TabsContent>
         </div>
-      </div>
+      </Tabs>
     </div>
   );
 });
