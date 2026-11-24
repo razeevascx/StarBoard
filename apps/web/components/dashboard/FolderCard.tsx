@@ -15,7 +15,7 @@ type FolderCardProps = {
 
 export function FolderCard({ href, name, description, bookmarkCount, color }: Readonly<FolderCardProps>) {
   return (
-    <Link href={href} className={`${styles.link} group relative flex h-full min-w-0 flex-col items-center rounded-2xl bg-ctp-mantle/30 px-5 pb-6 pt-3 text-center transition-colors hover:bg-ctp-surface0/30`} style={{ "--folder-color": color } as CSSProperties}>
+    <Link href={href} className={`${styles.link} group relative flex h-full min-w-0 flex-col items-center rounded-md bg-ctp-mantle/30 px-5 pb-6 pt-3 text-center transition-colors hover:bg-ctp-surface0/30`} style={{ "--folder-color": color } as CSSProperties}>
       <div className={styles.visual} aria-hidden="true">
         <div className={styles.stage}>
           <div className={styles.back} />

@@ -1,7 +1,9 @@
+import { siteOrigin } from "@/lib/site";
+
 /** The public origin used for canonical URLs and crawler files. */
-export function getSiteUrl(): URL | null {
+export function getSiteUrl(): URL {
   const value = process.env.SITE_URL?.trim();
-  if (!value) return null;
+  if (!value) return new URL(siteOrigin);
 
   let url: URL;
   try {

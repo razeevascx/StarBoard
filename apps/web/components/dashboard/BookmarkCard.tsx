@@ -61,7 +61,7 @@ export function BookmarkCard({ bookmark, collections }: { bookmark: SavedBookmar
   };
 
   return (
-    <li ref={cardRef} className="group overflow-hidden border border-ctp-surface1 bg-ctp-mantle/50 transition-colors hover:border-ctp-mauve/50">
+    <li ref={cardRef} className="group overflow-hidden rounded-md border border-ctp-surface1 bg-ctp-mantle/50 transition-colors hover:border-ctp-mauve/50">
       <div className="relative aspect-[16/9] overflow-hidden bg-ctp-surface0/50">
         {imageUrl && !imageFailed ? (
           <Image src={imageUrl} alt="" fill sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw" unoptimized className="object-cover" onError={() => setImageFailed(true)} />

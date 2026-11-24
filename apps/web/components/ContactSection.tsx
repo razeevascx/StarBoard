@@ -58,7 +58,7 @@ export function ContactSection() {
               href={href}
               target="_blank"
               rel="noreferrer noopener"
-              className="group flex flex-col rounded-2xl border border-ctp-surface1/60 bg-ctp-mantle/50 p-6 transition-colors hover:border-ctp-mauve/60 hover:bg-ctp-mantle focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ctp-mauve sm:p-8"
+              className="group flex flex-col rounded-md border border-ctp-surface1/60 bg-ctp-mantle/50 p-6 transition-colors hover:border-ctp-mauve/60 hover:bg-ctp-mantle focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ctp-mauve sm:p-8"
             >
               <span className="flex size-11 items-center justify-center rounded-xl bg-ctp-mauve/10 text-ctp-mauve">
                 <Icon aria-hidden="true" className="size-5" />

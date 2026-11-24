@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ModelContextProtocolDark } from "@ridemountainpig/svgl-react";
 import { Brand } from "@/components/Brand";
 import { UserMenu } from "@/components/UserMenu";
 import { collectionColor } from "@/lib/collection-colors";
@@ -67,10 +68,16 @@ export function DashboardSidebar({ collections }: { collections: Collection[] })
         </div>
         <div>
           <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-[0.16em] text-ctp-overlay0">Tools</p>
-          <Link href="/dashboard/trash" aria-current={pathname === "/dashboard/trash" ? "page" : undefined} className={`flex min-h-11 items-center gap-3 px-3 py-3 text-sm font-medium transition-colors ${pathname === "/dashboard/trash" ? "bg-ctp-mauve/15 text-ctp-mauve" : "text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text"}`}>
-            <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" /></svg>
-            Trash
-          </Link>
+          <div className="space-y-1">
+            <Link href="/dashboard/mcp" aria-current={pathname === "/dashboard/mcp" ? "page" : undefined} className={`flex min-h-11 items-center gap-3 px-3 py-3 text-sm font-medium transition-colors ${pathname === "/dashboard/mcp" ? "bg-ctp-mauve/15 text-ctp-mauve" : "text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text"}`}>
+              <ModelContextProtocolDark width={16} height={16} className="size-4 shrink-0" aria-hidden="true" />
+              MCP
+            </Link>
+            <Link href="/dashboard/trash" aria-current={pathname === "/dashboard/trash" ? "page" : undefined} className={`flex min-h-11 items-center gap-3 px-3 py-3 text-sm font-medium transition-colors ${pathname === "/dashboard/trash" ? "bg-ctp-mauve/15 text-ctp-mauve" : "text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text"}`}>
+              <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" /></svg>
+              Trash
+            </Link>
+          </div>
         </div>
       </nav>
       <div className="mt-auto shrink-0 px-4 pb-3">

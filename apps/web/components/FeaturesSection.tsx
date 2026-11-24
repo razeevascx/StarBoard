@@ -88,7 +88,7 @@ export function FeaturesSection() {
           description="Your clock, shortcuts, and saved links. Everything you need to start browsing, in one familiar place."
         />
         <div className="mt-10 grid gap-4 md:grid-cols-2">
-          <article className="flex flex-col rounded-2xl border border-ctp-surface1/60 bg-ctp-base p-6 sm:p-8">
+          <article className="flex flex-col rounded-md border border-ctp-surface1/60 bg-ctp-base p-6 sm:p-8">
             <Clock aria-hidden="true" className="size-5 text-ctp-peach" />
             <h3 className="mt-5 text-xl font-semibold">
               Start at your own pace
@@ -113,7 +113,7 @@ export function FeaturesSection() {
           {features.map(({ icon: Icon, title, description, preview }) => (
             <article
               key={title}
-              className="flex flex-col rounded-2xl border border-ctp-surface1/60 bg-ctp-base p-6 sm:p-8"
+              className="flex flex-col rounded-md border border-ctp-surface1/60 bg-ctp-base p-6 sm:p-8"
             >
               <Icon aria-hidden="true" className="size-5 text-ctp-lavender" />
               <h3 className="mt-5 text-lg font-semibold">{title}</h3>
@@ -125,7 +125,7 @@ export function FeaturesSection() {
               </div>
             </article>
           ))}
-          <article className="flex flex-col gap-5 rounded-2xl border border-ctp-surface1/60 bg-ctp-base p-6 sm:flex-row sm:items-center sm:p-8 md:col-span-2">
+          <article className="flex flex-col gap-5 rounded-md border border-ctp-surface1/60 bg-ctp-base p-6 sm:flex-row sm:items-center sm:p-8 md:col-span-2">
             <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-ctp-green/10">
               <RefreshCw aria-hidden="true" className="size-5 text-ctp-green" />
             </div>

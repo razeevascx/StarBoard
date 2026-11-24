@@ -16,7 +16,7 @@ export function Card({
 }: CardProps = {}) {
   return (
     <article
-      className={`w-full max-w-sm border border-border bg-card p-6 text-card-foreground shadow-sm ${className}`}
+      className={`w-full max-w-sm rounded-md border border-border bg-card p-6 text-card-foreground shadow-sm ${className}`}
       {...props}
     >
       {title && <h3 className="text-lg font-semibold">{title}</h3>}
