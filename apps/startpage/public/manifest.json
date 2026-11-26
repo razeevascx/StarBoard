@@ -3,19 +3,32 @@
   "name": "Starboard",
   "version": "1.0.0",
   "description": "A calm, customizable command center for your browser.",
-  "permissions": ["storage", "cookies", "unlimitedStorage", "activeTab"],
-  "optional_permissions": ["bookmarks"],
+  "permissions": [
+    "storage",
+    "cookies",
+    "unlimitedStorage",
+    "activeTab"
+  ],
+  "optional_permissions": [
+    "bookmarks"
+  ],
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
   "action": {
     "default_title": "Open Starboard",
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/16.png",
+      "32": "icons/32.png",
+      "48": "icons/48.png",
+      "128": "icons/128.png"
+    }
   },
   "icons": {
-    "16": "favicon.svg",
-    "32": "favicon.svg",
-    "48": "favicon.svg",
-    "128": "favicon.svg"
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
   }
 }
