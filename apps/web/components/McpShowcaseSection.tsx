@@ -22,7 +22,7 @@ const clients = [
 ] as const;
 
 const capabilities = [
-  "Clerk OAuth 2.1 with dynamic client registration",
+  "Clerk OAuth with the profile scope",
   "7 tools for bookmarks, collections, and trash",
   "Interactive MCP Apps library widget",
 ] as const;

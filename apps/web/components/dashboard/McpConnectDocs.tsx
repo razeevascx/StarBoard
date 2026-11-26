@@ -183,9 +183,8 @@ export function McpConnectDocs({
             <div>
               <CardTitle>MCP Endpoint</CardTitle>
               <CardDescription className="mt-1 text-sm leading-6">
-                Remote Streamable HTTP endpoint protected with Clerk OAuth 2.1 (dynamic client
-                registration, <code className="font-mono text-xs text-foreground">profile</code>{" "}
-                scope).
+                Connect over Streamable HTTP using Clerk OAuth with the{" "}
+                <code className="font-mono text-xs text-foreground">profile</code> scope.
               </CardDescription>
             </div>
           </div>

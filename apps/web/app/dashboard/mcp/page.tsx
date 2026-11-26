@@ -14,7 +14,9 @@ export default async function DashboardMcpPage() {
 
   const productionEndpointUrl = productionResource;
   const localEndpointUrl =
-    mcpAuthOptions.resourceUrl !== productionEndpointUrl ? mcpAuthOptions.resourceUrl : undefined;
+    ["localhost", "127.0.0.1", "[::1]"].includes(new URL(mcpAuthOptions.resourceUrl).hostname)
+      ? mcpAuthOptions.resourceUrl
+      : undefined;
 
   return (
     <>
