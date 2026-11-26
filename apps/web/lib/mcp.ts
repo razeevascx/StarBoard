@@ -1,10 +1,15 @@
 import type { McpAuthOptions } from "@clerk/mcp-tools/next";
-import { getSiteUrl } from "@/lib/site-url";
+import { generateProtectedResourceMetadata } from "@clerk/mcp-tools/server";
 
-const configuredResourceUrl = process.env.MCP_RESOURCE_URL?.trim();
-const resourceUrl = configuredResourceUrl
-  ? configuredResourceUrl
-  : new URL("/mcp", getSiteUrl()).href;
+export const productionResource = "https://mcp.starboard.razeev.com/mcp";
+const resourceUrl = process.env.MCP_RESOURCE_URL?.trim() || productionResource;
+if (resourceUrl === productionResource) {
+  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  if (!publishableKey || generateProtectedResourceMetadata({ resourceUrl, publishableKey })
+    .authorization_servers[0] !== "https://clerk.starboard.razeev.com") {
+    throw new Error("The hosted MCP resource requires the production Starboard Clerk instance.");
+  }
+}
 
 export const mcpAuthOptions = {
   resourceUrl,

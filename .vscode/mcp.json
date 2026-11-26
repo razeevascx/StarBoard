@@ -1,0 +1,11 @@
+{
+  "servers": {
+    "starboard": {
+      "type": "http",
+      "url": "https://starboard.razeev.com/mcp",
+      "oauth": {
+        "clientId": "TdtNnsU34oU9ZcMB"
+      }
+    }
+  }
+}

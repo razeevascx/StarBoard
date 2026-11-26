@@ -156,6 +156,7 @@ const corsHeaders = {
 };
 
 async function corsAuthHandler(req: Request) {
+  if (req.url !== mcpAuthOptions.resourceUrl) return new Response(null, { status: 421 });
   const response = await authHandler(req);
   const headers = new Headers(response.headers);
   for (const [name, value] of Object.entries(corsHeaders)) headers.set(name, value);
