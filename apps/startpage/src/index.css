@@ -7,6 +7,11 @@
 @import "@catppuccin/tailwindcss/mocha.css";
 
 body {
+  --card: var(--color-ctp-mantle);
+  --border: var(--color-ctp-surface1);
+  --foreground: var(--color-ctp-text);
+  --muted: var(--color-ctp-surface0);
+  --muted-foreground: var(--color-ctp-subtext0);
   @apply bg-ctp-base text-ctp-text;
 }
 
@@ -14,6 +19,7 @@ body {
   --color-foreground: var(--color-ctp-text);
   --color-muted-foreground: var(--color-ctp-subtext0);
   --color-muted: var(--color-ctp-surface0);
+  --color-border: var(--color-ctp-surface1);
   --color-secondary: var(--color-ctp-mauve);
   --color-ring: var(--color-ctp-mauve);
 }
@@ -21,5 +27,20 @@ body {
 @utility typography-body {
   font-size: 1rem;
   line-height: 1.75rem;
-  color: var(--color-ctp-subtext0);
+  color: var(--muted-foreground);
+}
+
+@utility surface-raised {
+  border-width: 1px;
+  border-color: transparent;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--surface-color, var(--card)) 97%, white), var(--surface-bottom, color-mix(in srgb, var(--surface-color, var(--card)) 95%, var(--foreground)))) padding-box, linear-gradient(to bottom, var(--surface-stroke-top, color-mix(in srgb, var(--border) 75%, var(--foreground))), var(--surface-stroke-bottom, var(--border))) border-box;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.12), 0 8px 24px -8px rgb(0 0 0 / 0.25);
+}
+
+@utility typography-section-title {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: var(--foreground);
 }

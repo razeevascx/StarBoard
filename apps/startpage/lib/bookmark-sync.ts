@@ -1,5 +1,7 @@
 import { extensionApi } from "./browser";
 
+const downloadedIdsKey = "bookmarkSyncDownloadedIds";
+
 export type SyncBookmark = {
   sourceId: string;
   title: string;
@@ -32,6 +34,7 @@ async function getInstallationId(): Promise<string> {
 export function collectSyncBookmarks(
   tree: chrome.bookmarks.BookmarkTreeNode[],
   installationId: string,
+  downloadedIds: ReadonlySet<string> = new Set(),
 ): SyncBookmark[] {
   const bookmarks: SyncBookmark[] = [];
   const visit = (
@@ -41,6 +44,7 @@ export function collectSyncBookmarks(
     for (const node of nodes) {
       if (
         node.url &&
+        !downloadedIds.has(node.id) &&
         node.url.length <= 4096 &&
         /^https?:\/\//i.test(node.url)
       ) {
@@ -65,11 +69,18 @@ export function collectSyncBookmarks(
 }
 
 export async function readSyncBookmarks(): Promise<SyncBookmark[]> {
-  const [tree, installationId] = await Promise.all([
+  const [tree, installationId, downloadedIds] = await Promise.all([
     readBookmarkTree(),
     getInstallationId(),
+    readDownloadedIds(),
   ]);
-  return collectSyncBookmarks(tree, installationId);
+  return collectSyncBookmarks(tree, installationId, downloadedIds);
+}
+
+async function readDownloadedIds(): Promise<Set<string>> {
+  const stored = await extensionApi?.storage?.local?.get(downloadedIdsKey);
+  const ids = stored?.[downloadedIdsKey];
+  return new Set(Array.isArray(ids) ? ids : []);
 }
 
 export async function uploadBookmarks(
@@ -123,6 +134,7 @@ export async function downloadBookmarks(
 ): Promise<ServerBookmark[]> {
   const target = new URL(webUrl).origin;
   const response = await fetch(`${target}/api/bookmarks/import`, {
+    cache: "no-store",
     headers: { Authorization: `Bearer ${token}` },
   });
   if (response.status === 401)
@@ -130,7 +142,24 @@ export async function downloadBookmarks(
   const result = await response.json().catch(() => null);
   if (!response.ok)
     throw new Error(typeof result?.error === "string" ? result.error : "Could not download bookmarks.");
-  return Array.isArray(result?.bookmarks) ? result.bookmarks : [];
+  if (!Array.isArray(result?.bookmarks) || result.bookmarks.some((bookmark: unknown) => {
+    if (typeof bookmark !== "object" || bookmark === null) return true;
+    const { url, title, collectionName } = bookmark as Partial<ServerBookmark>;
+    return typeof url !== "string" || typeof title !== "string" ||
+      (collectionName !== null && typeof collectionName !== "string");
+  })) {
+    throw new Error(`Unexpected sync response from ${target}. Use the public dashboard URL.`);
+  }
+  return result.bookmarks;
+}
+
+function normalizeSyncUrl(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "http:" || parsed.protocol === "https:" ? parsed.href : null;
+  } catch {
+    return null;
+  }
 }
 
 export async function mergeServerBookmarks(
@@ -142,15 +171,22 @@ export async function mergeServerBookmarks(
   const tree = await extensionApi.bookmarks.getTree();
   const existingUrls = new Set<string>();
   const folders = new Map<string, string>();
+  const normalizeFolderName = (name: string) => name.trim().replace(/\s+/g, " ").toLowerCase();
+  const downloadedIds = await readDownloadedIds();
+  const storedIds = new Set(downloadedIds);
+  downloadedIds.clear();
 
-  const visit = (
-    nodes: chrome.bookmarks.BookmarkTreeNode[],
-    parentTitle: string | null = null,
-  ) => {
+  const visit = (nodes: chrome.bookmarks.BookmarkTreeNode[]) => {
     for (const node of nodes) {
-      if (node.url) existingUrls.add(node.url);
-      if (!node.url && node.title) folders.set(node.title, node.id);
-      if (node.children) visit(node.children, node.title || parentTitle);
+      if (node.url) {
+        const url = normalizeSyncUrl(node.url);
+        if (url) existingUrls.add(url);
+        if (storedIds.has(node.id)) downloadedIds.add(node.id);
+      } else if (node.title) {
+        const name = normalizeFolderName(node.title);
+        if (!folders.has(name)) folders.set(name, node.id);
+      }
+      if (node.children) visit(node.children);
     }
   };
   visit(tree);
@@ -161,14 +197,21 @@ export async function mergeServerBookmarks(
   const defaultParentId = bar?.id ?? root?.children?.[0]?.id ?? root?.id;
   if (!defaultParentId) return 0;
 
+  const storage = extensionApi.storage?.local;
+  if (!storage) throw new Error("Extension storage is unavailable.");
+  const saveDownloadedIds = () => storage.set({ [downloadedIdsKey]: [...downloadedIds] });
+  if (storedIds.size !== downloadedIds.size) await saveDownloadedIds();
+
   let added = 0;
   for (const bookmark of bookmarks) {
-    if (!bookmark.url || existingUrls.has(bookmark.url)) continue;
+    const url = normalizeSyncUrl(bookmark.url);
+    if (!url || existingUrls.has(url)) continue;
 
     let parentId = defaultParentId;
     const folderName = bookmark.collectionName?.trim();
     if (folderName) {
-      const existingFolderId = folders.get(folderName);
+      const normalizedName = normalizeFolderName(folderName);
+      const existingFolderId = folders.get(normalizedName);
       if (existingFolderId) {
         parentId = existingFolderId;
       } else {
@@ -176,17 +219,19 @@ export async function mergeServerBookmarks(
           parentId: defaultParentId,
           title: folderName,
         });
-        folders.set(folderName, folder.id);
+        folders.set(normalizedName, folder.id);
         parentId = folder.id;
       }
     }
 
-    await extensionApi.bookmarks.create({
+    const localBookmark = await extensionApi.bookmarks.create({
       parentId,
-      title: bookmark.title || bookmark.url,
-      url: bookmark.url,
+      title: bookmark.title || url,
+      url,
     });
-    existingUrls.add(bookmark.url);
+    downloadedIds.add(localBookmark.id);
+    await saveDownloadedIds();
+    existingUrls.add(url);
     added++;
   }
   return added;

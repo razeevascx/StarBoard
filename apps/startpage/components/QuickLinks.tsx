@@ -3,6 +3,7 @@ import { Folder } from "lucide-react";
 import { memo } from "react";
 import { handleFaviconError, getFaviconUrl } from "../lib/favicon";
 import { ICON_MAP } from "../lib/quicklinks";
+import { Card } from "./hangry-ui/components/card";
 
 interface LinkItem {
   id: string;
@@ -43,55 +44,52 @@ const QuickLinks = memo(function QuickLinks({
       {links.map((app) => {
         const IconComponent = app.iconId ? ICON_MAP[app.iconId] : null;
 
-        return app.isFolder ? (
-          <button
-            key={app.id}
-            onClick={() => onFolderClick?.(app.id)}
-            className={cn(
-              isList
-                ? "group flex items-center gap-4 px-4 py-5 text-left"
-                : "group flex size-30 flex-col items-center justify-center p-6",
-              "rounded-md bg-ctp-surface0/20 backdrop-blur-md border border-ctp-surface1/40",
-              "transition-all duration-500 hover:bg-ctp-surface0/40 hover:scale-110 hover:shadow-2xl hover:border-ctp-mauve/50",
-            )}
-            title={app.name}
-          >
-            <div className={cn("flex items-center justify-center text-ctp-mauve transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(203,166,247,0.4)]", isList ? "size-8" : "size-12")}>
-              <Folder className={isList ? "size-6" : "w-10 h-10"} />
-            </div>
-            <span className={cn("font-bold tracking-[0.1em] text-ctp-subtext0 truncate", isList ? "text-xs" : "mt-3 max-w-25 text-center text-[10px]")}>
-              {app.name}
-            </span>
-          </button>
-        ) : (
-          <a
-            key={app.id || app.name}
-            href={app.url}
-            className={cn(
-              isList
-                ? "group flex items-center gap-4 px-4 py-5"
-                : "group flex flex-col items-center justify-center p-6",
-              "rounded-md bg-ctp-surface0/20 backdrop-blur-md border border-ctp-surface1/40",
-              "transition-all duration-500 hover:bg-ctp-surface0/40 hover:scale-110 hover:shadow-2xl hover:border-ctp-mauve/50",
-            )}
-            title={app.name}
-          >
-            <div className={cn("flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(203,166,247,0.4)]", isList ? "size-8" : "size-12")}>
-              {IconComponent ? (
-                <IconComponent className="w-full h-full" />
+        const className = cn(
+          "group min-w-0 max-w-none items-center leading-normal hover:[--surface-stroke-top:var(--color-ctp-mauve)]",
+          isList ? "flex-row gap-4 text-left" : "min-h-30 justify-center gap-3",
+        );
+        const content = (
+          <>
+            <span
+              aria-hidden="true"
+              className={cn(
+                "flex shrink-0 items-center justify-center motion-safe:transition-transform motion-safe:group-hover:scale-110",
+                isList ? "size-8" : "size-12",
+              )}
+            >
+              {app.isFolder ? (
+                <Folder className={cn("text-ctp-mauve", isList ? "size-6" : "size-10")} />
+              ) : IconComponent ? (
+                <IconComponent className="size-full" />
               ) : (
                 <img
                   src={getFaviconUrl(app.url ?? "")}
                   alt=""
-                  className="w-full h-full object-contain"
+                  className="size-full object-contain"
                   onError={handleFaviconError}
                 />
               )}
-            </div>
-            <span className={cn("font-bold tracking-[0.1em] text-ctp-subtext0 truncate", isList ? "text-xs" : "mt-3 max-w-25 text-center text-[10px]")}>
+            </span>
+            <span
+              title={app.name}
+              className={cn(
+                "min-w-0 max-w-full truncate font-bold tracking-[0.1em] text-ctp-subtext0",
+                isList ? "text-xs" : "text-center text-[10px]",
+              )}
+            >
               {app.name}
             </span>
-          </a>
+          </>
+        );
+
+        return app.isFolder ? (
+          <Card key={app.id} as="button" size="sm" onClick={() => onFolderClick?.(app.id)} className={className}>
+            {content}
+          </Card>
+        ) : (
+          <Card key={app.id || app.name} as="a" size="sm" href={app.url} className={className}>
+            {content}
+          </Card>
         );
       })}
     </div>

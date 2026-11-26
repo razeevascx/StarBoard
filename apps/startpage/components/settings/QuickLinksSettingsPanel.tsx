@@ -1,3 +1,4 @@
+import { Card } from "../hangry-ui/components/card";
 import { Pencil, Trash2, Plus, X } from 'lucide-react';
 import { ICON_MAP } from '../../lib/quicklinks';
 import { getFaviconUrl, handleFaviconError } from '../../lib/favicon';
@@ -62,7 +63,7 @@ export default function QuickLinksSettingsPanel({
 
         <div className="grid grid-cols-1 gap-2">
           {quickLinks.map((link) => (
-            <div key={link.id} className="rounded-md flex items-center justify-between p-3 bg-ctp-surface0/20 border border-ctp-surface1/20 group hover:border-ctp-surface1/50 transition-all">
+            <Card key={link.id} size="sm" className="group max-w-none flex-row items-center justify-between gap-2 p-3 leading-normal">
               {editingId === link.id ? (
                 <form onSubmit={onUpdate} className="flex flex-1 gap-2 items-center">
                   <input
@@ -112,7 +113,7 @@ export default function QuickLinksSettingsPanel({
                       <p className="text-[10px] text-ctp-overlay1 truncate">{link.url}</p>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
                     <button onClick={() => onStartEditing(link)} className="rounded-md p-1.5 text-ctp-overlay1 hover:text-ctp-blue transition-colors">
                       <Pencil className="w-4 h-4" />
                     </button>
@@ -122,7 +123,7 @@ export default function QuickLinksSettingsPanel({
                   </div>
                 </>
               )}
-            </div>
+            </Card>
           ))}
           {quickLinks.length === 0 && (
             <p className="text-center py-8 text-[10px] text-ctp-overlay1 uppercase tracking-widest font-bold">

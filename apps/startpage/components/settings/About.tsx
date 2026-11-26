@@ -6,6 +6,7 @@ import {
   Palette,
   ShieldCheck,
 } from "lucide-react";
+import { Card } from "../hangry-ui/components/card";
 
 const features = [
   {
@@ -61,20 +62,21 @@ export default function About() {
 
       <section className="space-y-3">
         {features.map(({ icon: Icon, title, description }) => (
-          <div
+          <Card
             key={title}
-            className="rounded-md flex items-start gap-3 p-3  bg-ctp-surface0/40  transition-colors hover:bg-ctp-surface0/70"
+            size="sm"
+            className="max-w-none flex-row items-start gap-3 p-3"
           >
             <div className="rounded-md shrink-0 flex items-center justify-center size-8 bg-ctp-surface1/60 text-ctp-mauve">
               <Icon className="w-4 h-4" strokeWidth={2} />
             </div>
             <div className="min-w-0">
-              <h4 className="text-xs font-semibold text-ctp-text">{title}</h4>
+              <h3 className="text-xs font-semibold text-ctp-text">{title}</h3>
               <p className="text-[11px] text-ctp-subtext0 leading-relaxed mt-0.5">
                 {description}
               </p>
             </div>
-          </div>
+          </Card>
         ))}
       </section>
     </div>

@@ -3,7 +3,7 @@ import { getSiteUrl } from "@/lib/site-url";
 
 const configuredResourceUrl = process.env.MCP_RESOURCE_URL?.trim();
 const resourceUrl = configuredResourceUrl
-  ? new URL(configuredResourceUrl).href.replace(/\/$/, "")
+  ? configuredResourceUrl
   : new URL("/mcp", getSiteUrl()).href;
 
 export const mcpAuthOptions = {
