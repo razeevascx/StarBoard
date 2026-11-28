@@ -20,6 +20,8 @@ const footerGroups = [
     links: [
       { label: "Install extension", href: installUrl },
       { label: "Contact", href: "/contact" },
+      { label: "Privacy policy", href: "/privacy" },
+      { label: "Terms and conditions", href: "/terms" },
       { label: "GitHub", href: githubUrl },
       { label: "X (@razeevascx)", href: "https://x.com/razeevascx" },
     ],
