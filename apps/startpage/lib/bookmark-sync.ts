@@ -1,6 +1,12 @@
 import { extensionApi } from "./browser";
 
 const downloadedIdsKey = "bookmarkSyncDownloadedIds";
+const creatingServerUrls = new Set<string>();
+
+export function isServerBookmarkCreation(node: chrome.bookmarks.BookmarkTreeNode): boolean {
+  const url = node.url ? normalizeSyncUrl(node.url) : null;
+  return url !== null && creatingServerUrls.has(url);
+}
 
 export type SyncBookmark = {
   sourceId: string;
@@ -144,8 +150,8 @@ export async function downloadBookmarks(
     throw new Error(typeof result?.error === "string" ? result.error : "Could not download bookmarks.");
   if (!Array.isArray(result?.bookmarks) || result.bookmarks.some((bookmark: unknown) => {
     if (typeof bookmark !== "object" || bookmark === null) return true;
-    const { url, title, collectionName } = bookmark as Partial<ServerBookmark>;
-    return typeof url !== "string" || typeof title !== "string" ||
+    const { id, url, title, collectionName } = bookmark as Partial<ServerBookmark>;
+    return typeof id !== 'string' || !id || typeof url !== "string" || !normalizeSyncUrl(url) || typeof title !== "string" ||
       (collectionName !== null && typeof collectionName !== "string");
   })) {
     throw new Error(`Unexpected sync response from ${target}. Use the public dashboard URL.`);
@@ -164,12 +170,20 @@ function normalizeSyncUrl(url: string): string | null {
 
 export async function mergeServerBookmarks(
   bookmarks: ServerBookmark[],
+  pendingLocalIds: ReadonlySet<string> = new Set(),
 ): Promise<number> {
-  if (!extensionApi?.bookmarks?.getTree || !extensionApi.bookmarks.create)
+  if (!extensionApi?.bookmarks?.getTree || !extensionApi.bookmarks.create || !extensionApi.bookmarks.remove || !extensionApi.bookmarks.update)
     throw new Error("This browser does not support bookmark writes.");
 
   const tree = await extensionApi.bookmarks.getTree();
   const existingUrls = new Set<string>();
+  const serverByUrl = new Map<string, ServerBookmark>();
+  for (const bookmark of bookmarks) {
+    const url = normalizeSyncUrl(bookmark.url);
+    if (!url) throw new Error('Server returned an invalid bookmark URL. No local bookmarks were changed.');
+    serverByUrl.set(url, bookmark);
+  }
+  const localBookmarks: chrome.bookmarks.BookmarkTreeNode[] = [];
   const folders = new Map<string, string>();
   const normalizeFolderName = (name: string) => name.trim().replace(/\s+/g, " ").toLowerCase();
   const downloadedIds = await readDownloadedIds();
@@ -179,6 +193,7 @@ export async function mergeServerBookmarks(
   const visit = (nodes: chrome.bookmarks.BookmarkTreeNode[]) => {
     for (const node of nodes) {
       if (node.url) {
+        localBookmarks.push(node);
         const url = normalizeSyncUrl(node.url);
         if (url) existingUrls.add(url);
         if (storedIds.has(node.id)) downloadedIds.add(node.id);
@@ -190,6 +205,20 @@ export async function mergeServerBookmarks(
     }
   };
   visit(tree);
+
+  // Only a validated, successful server snapshot may drive local deletions.
+  // Leave browser-internal bookmarks and folders alone.
+  for (const node of localBookmarks) {
+    const url = normalizeSyncUrl(node.url!);
+    if (!url) continue;
+    const serverBookmark = serverByUrl.get(url);
+    if (!serverBookmark && !pendingLocalIds.has(node.id)) {
+      await extensionApi.bookmarks.remove(node.id);
+      downloadedIds.delete(node.id);
+    } else if (serverBookmark && node.title !== serverBookmark.title) {
+      await extensionApi.bookmarks.update(node.id, { title: serverBookmark.title });
+    }
+  }
 
   const root = tree[0];
   const bar = root?.children?.find((node) => node.id === "1" || node.id === "toolbar_____")
@@ -224,11 +253,13 @@ export async function mergeServerBookmarks(
       }
     }
 
-    const localBookmark = await extensionApi.bookmarks.create({
-      parentId,
-      title: bookmark.title || url,
-      url,
-    });
+    creatingServerUrls.add(url);
+    let localBookmark: chrome.bookmarks.BookmarkTreeNode;
+    try {
+      localBookmark = await extensionApi.bookmarks.create({ parentId, title: bookmark.title || url, url });
+    } finally {
+      creatingServerUrls.delete(url);
+    }
     downloadedIds.add(localBookmark.id);
     await saveDownloadedIds();
     existingUrls.add(url);

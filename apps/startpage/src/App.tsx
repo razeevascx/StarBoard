@@ -30,6 +30,7 @@ import {
   updateConfigValue,
 } from '../lib/settings';
 import type { AppConfig } from './types';
+import { getThemeStyle } from '../lib/themes';
 
 const Settings = lazy(() => import('../components/Settings'));
 const SAMPLE_BOOKMARK_NODES = [
@@ -192,7 +193,7 @@ export default function App() {
   const handleSettingsOpen = useCallback(() => setIsSettingsOpen(true), []);
   const handleSettingsClose = useCallback(() => setIsSettingsOpen(false), []);
   const handleHomeClick = useCallback(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById('bookmark-scroll-container')?.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
   const hasBookmarkSidebar = config.showBookmarks && config.folderNavigation === 'sidebar' && (hasPermission.bookmarks || topLevelFolders.length > 0);
@@ -200,13 +201,24 @@ export default function App() {
 
   return (
     <main
+      data-custom-image={config.customBackgroundEnabled && config.bgType === 'image' && Boolean(config.bgValue)}
       className={cn(
-        "min-h-screen text-ctp-text selection:bg-ctp-mauve/30 overflow-x-hidden pt-16 transition-all duration-700",
+        "group/page relative isolate flex h-dvh flex-col text-ctp-text selection:bg-ctp-mauve/30 overflow-hidden pt-16 transition-all duration-700",
         config.bgType === "gradient" &&
           "from-ctp-mantle via-ctp-base to-ctp-base",
       )}
-      style={backgroundStyle}
+      style={{
+        ...getThemeStyle(config.theme),
+        backgroundColor: backgroundStyle.backgroundColor,
+      }}
     >
+      {config.customBackgroundEnabled && config.bgType === 'image' && config.bgValue && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -inset-16 -z-10"
+          style={{ ...backgroundStyle, filter: `blur(${config.backgroundBlur}px)`, opacity: config.backgroundOpacity / 100 }}
+        />
+      )}
       <Navbar
         showSidebarToggle={hasBookmarkSidebar}
         sidebarOpen={sidebarOpen}
@@ -231,10 +243,13 @@ export default function App() {
         />
       </Suspense>
 
-      <Box className="flex flex-col items-center justify-center p-8 relative z-10 space-y-10">
-        {config.showGreeting && <Greeting />}
-
-        {config.showClock && <Clock />}
+      <Box className="flex min-h-0 w-full flex-1 flex-col items-center gap-10 px-8 pt-8 relative z-10">
+        {(config.showGreeting || config.showClock) && (
+          <div className="flex shrink-0 flex-col items-center group-data-[custom-image=true]/page:image-clock-text">
+            {config.showGreeting && <Greeting />}
+            {config.showClock && <Clock />}
+          </div>
+        )}
 
         {config.showBookmarks && (hasPermission.bookmarks || topLevelFolders.length > 0) && (
           <BookmarkManager

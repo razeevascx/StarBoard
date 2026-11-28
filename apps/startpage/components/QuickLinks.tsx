@@ -3,7 +3,6 @@ import { Folder } from "lucide-react";
 import { memo } from "react";
 import { handleFaviconError, getFaviconUrl } from "../lib/favicon";
 import { ICON_MAP } from "../lib/quicklinks";
-import { Card } from "./hangry-ui/components/card";
 
 interface LinkItem {
   id: string;
@@ -38,15 +37,16 @@ const QuickLinks = memo(function QuickLinks({
       className={cn(
         isList
           ? cn("grid w-full mx-auto items-start gap-2 p-6", cardGridColumns)
-          : cn("grid w-full mx-auto items-center justify-center gap-5 p-10", cardGridColumns),
+          : cn("grid w-full mx-auto items-center justify-center gap-2 rounded-xl p-2", cardGridColumns),
       )}
     >
       {links.map((app) => {
         const IconComponent = app.iconId ? ICON_MAP[app.iconId] : null;
 
         const className = cn(
-          "group min-w-0 max-w-none items-center leading-normal hover:[--surface-stroke-top:var(--color-ctp-mauve)]",
-          isList ? "flex-row gap-4 text-left" : "min-h-30 justify-center gap-3",
+          "group flex w-full min-w-0 items-center rounded-xl border-0 bg-(--card) p-4 leading-normal shadow-sm hover:bg-(--muted) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ctp-mauve motion-safe:transition-colors",
+          "group-data-[custom-image=true]/page:bg-(--card)/60 group-data-[custom-image=true]/page:backdrop-blur-xl group-data-[custom-image=true]/page:hover:bg-(--muted)/70",
+          isList ? "flex-row gap-4 text-left" : "min-h-36 flex-col justify-center gap-4",
         );
         const content = (
           <>
@@ -54,7 +54,7 @@ const QuickLinks = memo(function QuickLinks({
               aria-hidden="true"
               className={cn(
                 "flex shrink-0 items-center justify-center motion-safe:transition-transform motion-safe:group-hover:scale-110",
-                isList ? "size-8" : "size-12",
+                isList ? "size-8" : "size-14",
               )}
             >
               {app.isFolder ? (
@@ -73,7 +73,7 @@ const QuickLinks = memo(function QuickLinks({
             <span
               title={app.name}
               className={cn(
-                "min-w-0 max-w-full truncate font-bold tracking-[0.1em] text-ctp-subtext0",
+                "min-w-0 max-w-full truncate font-bold tracking-widest text-ctp-subtext0",
                 isList ? "text-xs" : "text-center text-[10px]",
               )}
             >
@@ -83,13 +83,13 @@ const QuickLinks = memo(function QuickLinks({
         );
 
         return app.isFolder ? (
-          <Card key={app.id} as="button" size="sm" onClick={() => onFolderClick?.(app.id)} className={className}>
+          <button key={app.id} type="button" onClick={() => onFolderClick?.(app.id)} className={className}>
             {content}
-          </Card>
+          </button>
         ) : (
-          <Card key={app.id || app.name} as="a" size="sm" href={app.url} className={className}>
+          <a key={app.id || app.name} href={app.url} className={className}>
             {content}
-          </Card>
+          </a>
         );
       })}
     </div>

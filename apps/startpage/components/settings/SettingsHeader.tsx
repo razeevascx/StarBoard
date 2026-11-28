@@ -1,7 +1,7 @@
 import { X } from 'lucide-react';
 import { TabsList, TabsTrigger } from '../hangry-ui/components/tabs';
 
-export type Tab = 'general' | 'links' | 'account' | 'about';
+export type Tab = 'general' | 'links' | 'account' | 'theme';
 
 type SettingsHeaderProps = Readonly<{
   onClose: () => void;
@@ -11,7 +11,7 @@ const TAB_LABELS: Readonly<Record<Tab, string>> = {
   general: 'General',
   links: 'Quick Links',
   account: 'Account',
-  about: 'About',
+  theme: 'Theme',
 };
 
 export default function SettingsHeader({ onClose }: SettingsHeaderProps) {

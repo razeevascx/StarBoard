@@ -4,7 +4,7 @@ import type { AppConfig } from "../src/types";
 import SettingsHeader, { type Tab } from "./settings/SettingsHeader";
 import GeneralSettingsPanel from "./settings/GeneralSettingsPanel";
 import QuickLinksSettingsPanel from "./settings/QuickLinksSettingsPanel";
-import About from "./settings/About";
+import ThemeSettingsPanel from "./settings/ThemeSettingsPanel";
 import AccountSync from "./AccountSync";
 import { Tabs, TabsContent } from "./hangry-ui/components/tabs";
 import { extensionUrl } from "../lib/browser";
@@ -84,8 +84,8 @@ const Settings = memo(function Settings({
             onTogglePermission={onTogglePermission}
           />
         );
-      case "about":
-        return <About />;
+      case "theme":
+        return <ThemeSettingsPanel config={config} updateConfig={updateConfig} />;
       case "links":
         return (
           <QuickLinksSettingsPanel
@@ -121,8 +121,8 @@ const Settings = memo(function Settings({
           onClose={onClose}
         />
 
-        <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {(['general', 'links', 'about'] as const).map((tab) => (
+        <div className="flex-1 overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden">
+          {(['general', 'links', 'theme'] as const).map((tab) => (
             <TabsContent key={tab} value={tab}>
               {activeTab === tab ? renderActiveTab() : null}
             </TabsContent>

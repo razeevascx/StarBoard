@@ -1,4 +1,11 @@
+import type { ThemeId } from '../lib/themes';
+
 export interface AppConfig {
+  theme: ThemeId;
+  customBackgroundEnabled: boolean;
+  uploadedImages: string[];
+  backgroundBlur: number;
+  backgroundOpacity: number;
   showClock: boolean;
   showGreeting: boolean;
   showBookmarks: boolean;

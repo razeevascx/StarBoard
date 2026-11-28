@@ -64,6 +64,7 @@ export default defineConfig(({ mode }) => {
           if (browserTarget === "chrome" && extensionKey)
             manifest.key = extensionKey;
           if (browserTarget === "firefox") {
+            manifest.background = { scripts: ['background.js'], type: 'module' };
             manifest.browser_specific_settings = {
               gecko: {
                 id: "starboard@razeev.com",
@@ -81,6 +82,7 @@ export default defineConfig(({ mode }) => {
             };
           }
           if (browserTarget === "safari") {
+            delete manifest.background;
             // Safari does not expose the WebExtensions bookmarks API.
             delete manifest.optional_permissions;
             manifest.browser_specific_settings = {
@@ -99,6 +101,10 @@ export default defineConfig(({ mode }) => {
         input: {
           main: resolve(import.meta.dirname, "index.html"),
           popup: resolve(import.meta.dirname, "popup.html"),
+          background: resolve(import.meta.dirname, "src/background.ts"),
+        },
+        output: {
+          entryFileNames: (chunk) => chunk.name === 'background' ? 'background.js' : 'assets/[name]-[hash].js',
         },
       },
     },

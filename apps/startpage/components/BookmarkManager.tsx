@@ -52,9 +52,15 @@ const BookmarkManager = memo(function BookmarkManager({
       value={activeFolderId ?? ''}
       onValueChange={onFolderSelect}
       orientation={folderNavigation === 'sidebar' ? 'vertical' : 'horizontal'}
-      className="mx-auto w-full max-w-6xl"
+      className={`mx-auto min-h-0 w-full max-w-6xl flex-1 ${folderNavigation === 'bottom' ? 'pb-12' : ''}`}
     >
-      <div className={folderNavigation === "bottom" ? "min-w-0 w-full pb-16" : "min-w-0 w-full"}>
+      <div
+        id="bookmark-scroll-container"
+        role="region"
+        aria-label="Bookmarks"
+        tabIndex={0}
+        className="min-h-0 min-w-0 w-full flex-1 overflow-y-auto overscroll-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden focus-visible:outline-2 focus-visible:outline-ctp-mauve"
+      >
         {visibleFolders.map((folder) => (
           <TabsContent key={folder.id} value={folder.id}>
             {activeFolderId === folder.id && <QuickLinks links={bookmarkLinks} layout={layout} columns={columns} />}

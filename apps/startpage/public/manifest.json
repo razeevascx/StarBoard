@@ -12,6 +12,10 @@
   "optional_permissions": [
     "bookmarks"
   ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
