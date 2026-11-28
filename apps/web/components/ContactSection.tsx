@@ -7,7 +7,7 @@ const contactLinks = [
   {
     title: "Share an idea",
     description:
-      "Have a suggestion for your new tab? Tell us what would make Starboard more useful for you.",
+      "Have a suggestion for your new tab? Tell us what would make StartBoard more useful for you.",
     href: `${contactUrl}?title=Feedback%20for%20Starboard`,
     action: "Share feedback on GitHub",
     icon: MessageSquare,
@@ -23,7 +23,7 @@ const contactLinks = [
   {
     title: "Say hello",
     description:
-      "Connect with Razeev on X for a conversation about Starboard, or to see what’s being built next.",
+      "Connect with Razeev on X for a conversation about StartBoard, or to see what’s being built next.",
     href: "https://x.com/razeevascx",
     action: "Visit @razeevascx",
     icon: XDark,
@@ -41,11 +41,11 @@ export function ContactSection() {
           id="contact-title"
           className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl"
         >
-          Let’s make Starboard better.
+          Let’s make StartBoard better.
         </h1>
         <p className="mt-4 max-w-xl leading-7 text-ctp-subtext1">
           A question, a small improvement, or a new idea. We’d love to hear how
-          Starboard fits into your day.
+          StartBoard fits into your day.
         </p>
       </div>
       <div className="mt-10 grid gap-4 md:grid-cols-3">

@@ -5,7 +5,7 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { mcpAuthOptions, productionResource } from "@/lib/mcp";
 
 export const metadata: Metadata = {
-  title: "MCP | Starboard",
+  title: "MCP | StartBoard",
   robots: { index: false, follow: false },
 };
 
@@ -21,9 +21,10 @@ export default async function DashboardMcpPage() {
   return (
     <>
       <SectionHeading
+          as="h1"
         id="mcp-title"
         title="MCP"
-        description="Connect AI assistants to your Starboard bookmarks, collections, and trash over OAuth."
+        description="Connect AI assistants to your StartBoard bookmarks, collections, and trash over OAuth."
       />
       <McpConnectDocs
         endpointUrl={productionEndpointUrl}

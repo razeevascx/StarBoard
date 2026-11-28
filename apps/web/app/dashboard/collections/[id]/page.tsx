@@ -6,7 +6,7 @@ import { BookmarkCard } from "@/components/dashboard/BookmarkCard";
 import { BracketCard } from "@/components/hangry-ui/components/bracket-card";
 import { getCollectionWithBookmarks, listCollections } from "@/lib/library";
 
-export const metadata: Metadata = { title: "Collection | Starboard" };
+export const metadata: Metadata = { title: "Collection | StartBoard" };
 
 export default async function CollectionPage({ params }: { params: Promise<{ id: string }> }) {
   const { userId } = await auth();
@@ -18,7 +18,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ id:
 
   return (
     <>
-      <SectionHeading id="collection-title" title={data.collection.name} description={data.collection.description || "Bookmarks in this folder."} />
+      <SectionHeading as="h1" id="collection-title" title={data.collection.name} description={data.collection.description || "Bookmarks in this folder."} />
       {data.bookmarks.length ? (
         <ul className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {data.bookmarks.map((bookmark) => <BookmarkCard key={bookmark.id} bookmark={bookmark} collections={collections} />)}

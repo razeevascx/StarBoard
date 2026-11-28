@@ -97,6 +97,7 @@ interface CodeBlockProps {
   code?: string;
   language?: string;
   filename?: string;
+  inlineFilename?: boolean;
   showLineNumbers?: boolean;
   commands?: Record<"bun" | "npm" | "pnpm" | "yarn", string>;
   packageManager?: "bun" | "npm" | "pnpm" | "yarn";
@@ -108,6 +109,7 @@ export function CodeBlock({
   code = 'const greeting = "Hello, world!";\nconsole.log(greeting);',
   language = "javascript",
   filename = "",
+  inlineFilename = false,
   showLineNumbers,
   commands,
   packageManager,
@@ -138,7 +140,7 @@ export function CodeBlock({
     }
   }
 
-  const hideHeader = !commands && !filename;
+  const hideHeader = !commands && (!filename || inlineFilename);
   const header = (
     <CodeBlockHeader
       commands={Boolean(commands)}
@@ -167,6 +169,7 @@ export function CodeBlock({
         code={displayedCode}
         language={displayedLanguage}
         filename={filename}
+        inlineFilename={inlineFilename}
         showLineNumbers={
           showLineNumbers ??
           (!commands && !["text", "bash", "sh", "shell"].includes(language.toLowerCase()))
@@ -279,12 +282,14 @@ const CodeBlockRenderer = memo(function CodeBlockRenderer({
   code,
   language,
   filename,
+  inlineFilename,
   showLineNumbers,
   packageManager,
 }: {
   code: string;
   language: string;
   filename: string;
+  inlineFilename: boolean;
   showLineNumbers: boolean;
   packageManager?: string;
 }) {
@@ -315,6 +320,9 @@ const CodeBlockRenderer = memo(function CodeBlockRenderer({
       <Highlight prism={Prism} code={code} language={languageId} theme={prismTheme}>
         {({ tokens, getLineProps, getTokenProps }) => (
           <code className="min-w-max font-[family-name:var(--font-geist-mono)]">
+            {inlineFilename && filename && (
+              <div className="mb-3 select-none text-ctp-overlay0">{`// ${filename}`}</div>
+            )}
             {tokens.map((line, index) => (
               <div key={index} {...getLineProps({ line })} className="flex min-w-full">
                 {showLineNumbers && (

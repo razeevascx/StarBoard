@@ -4,7 +4,6 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/hangry-ui/components/card";
 
 type DashboardCardProps = {
@@ -17,8 +16,8 @@ export function DashboardCard({ title, description, children }: DashboardCardPro
   return (
     <Card className="max-w-none sm:p-8">
       <CardHeader>
-        <CardTitle className="text-xl">{title}</CardTitle>
-        <CardDescription className="max-w-lg text-sm leading-6">{description}</CardDescription>
+        <h2 className="text-lg font-semibold leading-snug tracking-tight text-ctp-text">{title}</h2>
+        <CardDescription className="max-w-prose text-sm leading-relaxed text-ctp-subtext0">{description}</CardDescription>
       </CardHeader>
       <CardContent className="mt-auto pt-2">{children}</CardContent>
     </Card>

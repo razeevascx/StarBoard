@@ -6,7 +6,7 @@ import { InstallButton } from "@/components/InstallButton";
 import { SectionHeading } from "@/components/SectionHeading";
 
 export const metadata: Metadata = {
-  title: "Dashboard | Starboard",
+  title: "Dashboard | StartBoard",
   robots: { index: false, follow: false },
 };
 
@@ -18,12 +18,13 @@ export default async function DashboardPage() {
   return (
     <>
         <SectionHeading
+          as="h1"
           id="dashboard-title"
-          title={name ? `Welcome, ${name}.` : "Welcome to Starboard."}
+          title={name ? `Welcome, ${name}.` : "Welcome to StartBoard."}
           description="Make yourself at home. Set up your browser and manage your account in one place."
         />
         <div className="mt-10 grid gap-5 lg:grid-cols-2">
-          <DashboardCard title="Your next tab starts here" description="Install the Starboard extension to keep your favorite links and bookmarks close whenever you open a new tab.">
+          <DashboardCard title="Your next tab starts here" description="Install the StartBoard extension to keep your favorite links and bookmarks close whenever you open a new tab.">
             <InstallButton>Get the extension</InstallButton>
           </DashboardCard>
           <DashboardCard title="Your account" description="Update your profile, manage your sign-in methods, and review your active sessions.">

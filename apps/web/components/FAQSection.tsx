@@ -5,9 +5,9 @@ import { contactUrl, githubUrl, installUrl } from "@/lib/site";
 const questions: readonly FaqItem[] = [
   {
     id: "what-is-starboard",
-    question: "What is Starboard?",
+    question: "What is StartBoard?",
     answer:
-      "Starboard is a customizable browser start page that puts your time and favorite links in one calm place.",
+      "StartBoard is a customizable browser start page that puts your time and favorite links in one calm place.",
   },
   {
     id: "how-to-install",
@@ -23,7 +23,7 @@ const questions: readonly FaqItem[] = [
         >
           setup instructions on GitHub
         </a>{" "}
-        to add Starboard to your browser.
+        to add StartBoard to your browser.
       </span>
     ),
   },
@@ -37,7 +37,7 @@ const questions: readonly FaqItem[] = [
     id: "existing-bookmarks",
     question: "Can I use my existing browser bookmarks?",
     answer:
-      "Yes. Grant bookmark access when you want Starboard to show your browser’s saved links and folders.",
+      "Yes. Grant bookmark access when you want StartBoard to show your browser’s saved links and folders.",
   },
   {
     id: "bookmark-sync",
@@ -50,7 +50,7 @@ const questions: readonly FaqItem[] = [
     question: "Can I connect AI assistants via MCP?",
     answer: (
       <span>
-        Yes. Starboard exposes an OAuth-protected Model Context Protocol endpoint so assistants like
+        Yes. StartBoard exposes an OAuth-protected Model Context Protocol endpoint so assistants like
         Antigravity, Claude, Cursor, and VS Code can read and manage your library. Check{" "}
         <Link
           href="/dashboard/mcp"
@@ -70,7 +70,7 @@ const questions: readonly FaqItem[] = [
   },
   {
     id: "open-source",
-    question: "Is Starboard open source?",
+    question: "Is StartBoard open source?",
     answer: (
       <span>
         Yes. Explore the code and contribute on{" "}

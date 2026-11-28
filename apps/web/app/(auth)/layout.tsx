@@ -5,7 +5,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <main id="main" className="min-h-dvh bg-ctp-base text-ctp-text">
       <LoginSplit
-        brand="✦ Starboard"
+        brand="✦ StartBoard"
         title=""
         description=""
         authContent={

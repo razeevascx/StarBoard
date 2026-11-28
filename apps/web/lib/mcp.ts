@@ -7,7 +7,7 @@ if (resourceUrl === productionResource) {
   const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
   if (!publishableKey || generateProtectedResourceMetadata({ resourceUrl, publishableKey })
     .authorization_servers[0] !== "https://clerk.starboard.razeev.com") {
-    throw new Error("The hosted MCP resource requires the production Starboard Clerk instance.");
+    throw new Error("The hosted MCP resource requires the production StartBoard Clerk instance.");
   }
 }
 

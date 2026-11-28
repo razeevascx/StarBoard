@@ -10,7 +10,7 @@ export function renderStarboardLibraryHtml(): string {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="light dark" />
-  <title>Starboard Library</title>
+  <title>StartBoard Library</title>
   <style>
     :root {
       /* Catppuccin Latte (light) */
@@ -597,7 +597,7 @@ export function renderStarboardLibraryHtml(): string {
           <rect width="64" height="64" rx="16" fill="#1e1e2e" />
           <path d="M32 11c1.9 12.6 8.4 19.1 21 21-12.6 1.9-19.1 8.4-21 21-1.9-12.6-8.4-19.1-21-21 12.6-1.9 19.1-8.4 21-21Z" fill="#cba6f7" />
         </svg>
-        <span>Starboard</span>
+        <span>StartBoard</span>
       </div>
       <div class="tabs" role="tablist" aria-label="Library sections">
         <button type="button" class="tab-btn" role="tab" id="tab-bookmarks" aria-selected="true" data-view="bookmarks">
@@ -1328,7 +1328,7 @@ export function renderStarboardLibraryHtml(): string {
           const initResult = await Promise.race([
             sendRequest("ui/initialize", {
               protocolVersion: "2026-01-26",
-              appInfo: { name: "Starboard Library", version: "1.0.0" },
+              appInfo: { name: "StartBoard Library", version: "1.0.0" },
               appCapabilities: {},
             }),
             new Promise((_, reject) => setTimeout(() => reject(new Error("Host handshake timed out.")), 1500)),

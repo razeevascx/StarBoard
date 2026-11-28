@@ -86,16 +86,16 @@ export function BookmarkCard({ bookmark, collections }: { bookmark: SavedBookmar
             ) : <Globe2 className="size-5" aria-hidden="true" />}
             <span className="truncate">{host}</span>
           </div>
-          <a href={bookmark.url} target="_blank" rel="noopener noreferrer" className="inline-flex max-w-full items-start gap-1.5 font-semibold text-ctp-text hover:text-ctp-mauve">
+          <h2 className="text-base font-semibold leading-snug"><a href={bookmark.url} target="_blank" rel="noopener noreferrer" className="inline-flex max-w-full items-start gap-1.5 text-ctp-text hover:text-ctp-mauve">
             <span className="line-clamp-2 break-words">{bookmark.title}</span>
             <ExternalLink className="mt-1 size-3.5 shrink-0" aria-hidden="true" />
-          </a>
-          {bookmark.description && <p className="mt-2 line-clamp-2 text-sm text-ctp-subtext0">{bookmark.description}</p>}
+          </a></h2>
+          {bookmark.description && <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-ctp-subtext0">{bookmark.description}</p>}
           {error && <p role="alert" className="mt-2 text-xs text-ctp-red">{error}</p>}
         </CardContent>
         <CardFooter className="mt-auto justify-between gap-2 border-border/60 px-4 py-3">
           {bookmark.collectionId && bookmark.collectionName && color ? (
-            <Link href={`/dashboard/collections/${bookmark.collectionId}`} className="max-w-[70%] truncate border px-2.5 py-1 text-xs font-medium hover:opacity-80" style={{ color, backgroundColor: `${color}1f`, borderColor: `${color}55` }}>
+            <Link href={`/dashboard/collections/${bookmark.collectionId}`} className="max-w-[70%] truncate rounded-md border px-2.5 py-1 text-xs font-medium hover:opacity-80" style={{ color, backgroundColor: `${color}1f`, borderColor: `${color}55` }}>
               {bookmark.collectionName}
             </Link>
           ) : <span className="text-xs text-ctp-overlay0">Unfiled</span>}

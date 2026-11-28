@@ -17,7 +17,6 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/hangry-ui/components/card";
 import { CodeBlock } from "@/components/hangry-ui/components/code-block";
 import {
@@ -114,7 +113,7 @@ const CLIENT_GUIDES: ClientGuide[] = [
     Icon: ClaudeCode,
     language: "bash",
     filename: "",
-    instructions: "Run this command in your terminal to register Starboard via HTTP transport:",
+    instructions: "Run this command in your terminal to register StartBoard via HTTP transport:",
     snippet: (endpointUrl) => `claude mcp add --transport http starboard ${endpointUrl}`,
   },
   {
@@ -181,8 +180,8 @@ export function McpConnectDocs({
               </span>
             </div>
             <div>
-              <CardTitle>MCP Endpoint</CardTitle>
-              <CardDescription className="mt-1 text-sm leading-6">
+              <h2 className="text-lg font-semibold leading-snug tracking-tight text-ctp-text">MCP endpoint</h2>
+              <CardDescription className="mt-1 text-sm leading-relaxed text-ctp-subtext0">
                 Connect over Streamable HTTP using Clerk OAuth with the{" "}
                 <code className="font-mono text-xs text-foreground">profile</code> scope.
               </CardDescription>
@@ -219,9 +218,9 @@ export function McpConnectDocs({
 
       <Card className="max-w-none">
         <CardHeader>
-          <CardTitle>Connect a Client</CardTitle>
-          <CardDescription className="text-sm leading-6">
-            Pick your AI client below, paste the configuration, and sign in with Starboard when
+          <h2 className="text-lg font-semibold leading-snug tracking-tight text-ctp-text">Connect a client</h2>
+          <CardDescription className="text-sm leading-relaxed text-ctp-subtext0">
+            Pick your AI client below, paste the configuration, and sign in with StartBoard when
             prompted.
           </CardDescription>
         </CardHeader>
@@ -249,6 +248,7 @@ export function McpConnectDocs({
                 <CodeBlock
                   language={client.language}
                   filename={client.filename}
+                  inlineFilename
                   code={client.snippet(activeEndpointUrl)}
                 />
               </TabsContent>

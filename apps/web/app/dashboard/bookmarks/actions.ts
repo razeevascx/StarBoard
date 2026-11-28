@@ -7,6 +7,8 @@ import {
   deleteBookmark,
   ensureProfile,
   permanentlyDeleteBookmark,
+  permanentlyDeleteAllTrashedBookmarks,
+  restoreAllTrashedBookmarks,
   restoreBookmark,
   updateBookmark,
 } from "@/lib/library";
@@ -89,4 +91,18 @@ export async function permanentlyDeleteBookmarkAction(id: string) {
   await permanentlyDeleteBookmark(userId, id);
   refreshLibrary();
   return { ok: true };
+}
+
+export async function restoreAllTrashedBookmarksAction() {
+  const userId = await signedInUser();
+  await restoreAllTrashedBookmarks(userId);
+  refreshLibrary();
+  return { ok: true } as const;
+}
+
+export async function permanentlyDeleteAllTrashedBookmarksAction() {
+  const userId = await signedInUser();
+  await permanentlyDeleteAllTrashedBookmarks(userId);
+  refreshLibrary();
+  return { ok: true } as const;
 }

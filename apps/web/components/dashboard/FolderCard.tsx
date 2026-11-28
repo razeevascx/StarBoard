@@ -37,9 +37,9 @@ export function FolderCard({ href, name, description, bookmarkCount, color }: Re
             </div>
           </div>
         </div>
-        <h2 className="w-full wrap-break-word font-semibold text-ctp-text">{name}</h2>
-        {description && <p className="mt-1 line-clamp-2 text-sm text-ctp-subtext0">{description}</p>}
-        <p className="mt-auto pt-3 text-xs font-medium text-ctp-subtext0">{bookmarkCount} {bookmarkCount === 1 ? "bookmark" : "bookmarks"}</p>
+        <h2 className="w-full wrap-break-word text-base font-semibold leading-snug text-ctp-text">{name}</h2>
+        {description && <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-ctp-subtext0">{description}</p>}
+        <p className="mt-auto pt-3 text-xs leading-normal text-ctp-subtext0">{bookmarkCount} {bookmarkCount === 1 ? "bookmark" : "bookmarks"}</p>
       </Link>
     </Card>
   );

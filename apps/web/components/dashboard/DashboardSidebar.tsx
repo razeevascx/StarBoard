@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { PanelLeftClose } from "lucide-react";
+import { ChevronRight, PanelLeftClose } from "lucide-react";
 import { ModelContextProtocolDark } from "@ridemountainpig/svgl-react";
 import { Brand } from "@/components/Brand";
 import { UserMenu } from "@/components/UserMenu";
@@ -11,7 +11,7 @@ import type { Collection } from "@/lib/library";
 
 const menuSections = [
   {
-    label: "Main Menu",
+    label: "Main menu",
     items: [
       { label: "Bookmarks", href: "/dashboard/bookmarks", icon: "M6 4h12v17l-6-4-6 4V4Z" },
       { label: "Collections", href: "/dashboard/collections", icon: "M3 7V4h6l2 3h10v13H3V7Z" },
@@ -23,23 +23,29 @@ export function DashboardSidebar({
   collections,
   id,
   onClose,
+  mobile = false,
 }: {
   collections: Collection[];
   id?: string;
   onClose?: () => void;
+  mobile?: boolean;
 }) {
   const pathname = usePathname();
 
   return (
     <aside
       id={id}
-      className="flex flex-col border-b border-ctp-surface1/40 bg-ctp-mantle/50 md:sticky md:top-0 md:h-dvh md:w-64 md:shrink-0 md:self-start md:border-r md:border-b-0"
+      className="flex h-dvh flex-col border-b border-ctp-surface1/40 bg-ctp-mantle/50 md:sticky md:top-0 md:w-64 md:shrink-0 md:self-start md:border-r md:border-b-0"
+      onClick={(event) => {
+        if (mobile && (event.target as HTMLElement).closest("a[href]")) onClose?.();
+      }}
     >
       <div className="flex items-center justify-between gap-2 px-5 py-6">
         <Brand />
         {onClose && (
           <button
             type="button"
+            autoFocus={mobile}
             onClick={onClose}
             aria-label="Close sidebar"
             aria-expanded={true}
@@ -51,10 +57,10 @@ export function DashboardSidebar({
           </button>
         )}
       </div>
-      <nav aria-label="Dashboard sections" className="flex flex-col gap-6 overflow-y-auto p-4 md:min-h-0 md:flex-1">
+      <nav aria-label="Dashboard sections" className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto overscroll-contain p-4">
         {menuSections.map((section) => (
           <div key={section.label}>
-            <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-[0.16em] text-ctp-overlay0">{section.label}</p>
+            <p className="mb-2 px-3 text-xs font-medium leading-normal text-ctp-subtext0">{section.label}</p>
             <div className="space-y-1">
               {section.items.map(({ label, href, icon }) => {
                 const isActive = pathname === href || pathname.startsWith(`${href}/`);
@@ -64,7 +70,7 @@ export function DashboardSidebar({
                     key={href}
                     href={href}
                     aria-current={isActive ? "page" : undefined}
-                    className={`flex min-h-11 min-w-0 items-center gap-3 px-3 py-3 text-sm font-medium transition-colors ${isActive ? "bg-ctp-mauve/15 text-ctp-mauve" : "text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text"}`}
+                    className={`flex min-h-11 min-w-0 items-center gap-3 px-3 py-3 text-sm font-semibold leading-normal transition-colors ${isActive ? "bg-ctp-mauve/15 text-ctp-mauve" : "text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text"}`}
                   >
                     <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
                       <path d={icon} />
@@ -76,29 +82,32 @@ export function DashboardSidebar({
             </div>
           </div>
         ))}
-        <div>
-          <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-[0.16em] text-ctp-overlay0">Folders</p>
-          <div className="space-y-1">
+        <details open className="group/folders">
+          <summary className="mb-2 flex min-h-9 cursor-pointer list-none items-center gap-2 rounded-md px-3 text-xs font-medium leading-normal text-ctp-subtext0 hover:bg-ctp-surface0/50 hover:text-ctp-text focus-visible:outline-2 focus-visible:outline-ctp-mauve [&::-webkit-details-marker]:hidden">
+            <ChevronRight className="size-3.5 shrink-0 group-open/folders:rotate-90" aria-hidden="true" />
+            Folders
+          </summary>
+          <div className="ml-5 space-y-1 border-l border-ctp-surface1/60 pl-2">
             {collections.map((collection) => {
               const href = `/dashboard/collections/${collection.id}`;
               const active = pathname === href;
               const color = collectionColor(collection.id, collection.color);
-              return <Link key={collection.id} href={href} aria-current={active ? "page" : undefined} className={`flex min-h-10 min-w-0 items-center gap-3 px-3 py-2 text-sm transition-colors ${active ? "bg-ctp-surface0 text-ctp-text" : "text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text"}`}>
+              return <Link key={collection.id} href={href} aria-current={active ? "page" : undefined} className={`flex min-h-10 min-w-0 items-center gap-3 px-3 py-2 text-sm leading-normal transition-colors ${active ? "bg-ctp-surface0 font-medium text-ctp-text" : "text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text"}`}>
                 <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7V4h6l2 3h10v13H3V7Z" /></svg>
                 <span className="truncate">{collection.name}</span>
               </Link>;
             })}
-            {!collections.length && <p className="px-3 text-xs text-ctp-overlay0">No folders yet</p>}
+            {!collections.length && <p className="px-3 text-xs leading-normal text-ctp-subtext0">No folders yet</p>}
           </div>
-        </div>
+        </details>
         <div>
-          <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-[0.16em] text-ctp-overlay0">Tools</p>
+          <p className="mb-2 px-3 text-xs font-medium leading-normal text-ctp-subtext0">Tools</p>
           <div className="space-y-1">
-            <Link href="/dashboard/mcp" aria-current={pathname === "/dashboard/mcp" ? "page" : undefined} className={`flex min-h-11 items-center gap-3 px-3 py-3 text-sm font-medium transition-colors ${pathname === "/dashboard/mcp" ? "bg-ctp-mauve/15 text-ctp-mauve" : "text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text"}`}>
+            <Link href="/dashboard/mcp" aria-current={pathname === "/dashboard/mcp" ? "page" : undefined} className={`flex min-h-11 items-center gap-3 px-3 py-3 text-sm font-semibold leading-normal transition-colors ${pathname === "/dashboard/mcp" ? "bg-ctp-mauve/15 text-ctp-mauve" : "text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text"}`}>
               <ModelContextProtocolDark width={16} height={16} className="size-4 shrink-0" aria-hidden="true" />
               MCP
             </Link>
-            <Link href="/dashboard/trash" aria-current={pathname === "/dashboard/trash" ? "page" : undefined} className={`flex min-h-11 items-center gap-3 px-3 py-3 text-sm font-medium transition-colors ${pathname === "/dashboard/trash" ? "bg-ctp-mauve/15 text-ctp-mauve" : "text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text"}`}>
+            <Link href="/dashboard/trash" aria-current={pathname === "/dashboard/trash" ? "page" : undefined} className={`flex min-h-11 items-center gap-3 px-3 py-3 text-sm font-semibold leading-normal transition-colors ${pathname === "/dashboard/trash" ? "bg-ctp-mauve/15 text-ctp-mauve" : "text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text"}`}>
               <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" /></svg>
               Trash
             </Link>

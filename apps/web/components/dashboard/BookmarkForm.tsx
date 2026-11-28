@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createBookmarkAction, updateBookmarkAction } from "@/app/dashboard/bookmarks/actions";
 import { toast } from "@/components/hangry-ui/components/toast";
 import type { Collection, SavedBookmark } from "@/lib/library";
+import styles from "./BookmarkForm.module.css";
 
 const inputClass = "min-h-11 w-full rounded-md border border-ctp-surface1 bg-ctp-base px-3 text-sm text-ctp-text outline-none placeholder:text-ctp-overlay0 focus:border-ctp-mauve";
 
@@ -62,7 +63,7 @@ export function BookmarkForm({ collections, bookmark, defaultCollectionId, onSav
       </label>
       <label className="block space-y-1.5 text-sm font-medium text-ctp-subtext1">
         <span>Collection</span>
-        <select className={inputClass} name="collectionId" defaultValue={bookmark?.collectionId ?? defaultCollectionId ?? ""}>
+        <select className={`${inputClass} ${styles.collectionSelect}`} name="collectionId" defaultValue={bookmark?.collectionId ?? defaultCollectionId ?? ""}>
           <option value="">No collection</option>
           {collections.map((collection) => <option key={collection.id} value={collection.id}>{collection.name}</option>)}
         </select>

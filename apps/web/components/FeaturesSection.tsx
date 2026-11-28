@@ -23,7 +23,7 @@ const folders = [
 const savedLinks = [
   { title: "Design Systems Kit", host: "figma.com", folder: "Design", dot: "bg-ctp-mauve" },
   { title: "Linear Method", host: "linear.app", folder: "Reading", dot: "bg-ctp-blue" },
-  { title: "Starboard Repository", host: "github.com", folder: "Dev Tools", dot: "bg-ctp-green" },
+  { title: "StartBoard Repository", host: "github.com", folder: "Dev Tools", dot: "bg-ctp-green" },
 ] as const;
 
 const quickLinks = [
@@ -231,7 +231,7 @@ export function FeaturesSection() {
               </h3>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-ctp-subtext1">
                 Optionally sign in to sync browser bookmarks from Chrome or Firefox to your
-                Starboard dashboard. Your folders become collections.
+                StartBoard dashboard. Your folders become collections.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">

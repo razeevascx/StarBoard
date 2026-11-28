@@ -51,7 +51,7 @@ export function McpShowcaseSection() {
           <SectionHeading
             id="mcp-showcase-title"
             title="Your bookmarks, ready for your AI."
-            description="Connect Starboard to your favorite AI assistant over OAuth 2.1. Search, save, organize, and restore bookmarks without leaving your chat or editor."
+            description="Connect StartBoard to your favorite AI assistant over OAuth 2.1. Search, save, organize, and restore bookmarks without leaving your chat or editor."
           />
 
           <div className="mt-6 flex flex-wrap gap-2">
@@ -87,7 +87,7 @@ export function McpShowcaseSection() {
         </div>
 
         <div className="min-w-0">
-          <CodeBlock language="json" filename="mcp.json" code={mcpSnippet} />
+          <CodeBlock language="json" filename="mcp.json" inlineFilename code={mcpSnippet} />
         </div>
       </div>
     </section>

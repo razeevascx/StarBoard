@@ -3,7 +3,7 @@ import { authAppearance } from "@/lib/auth-appearance";
 import { SignIn } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
-  title: "Sign in | Starboard",
+  title: "Sign in | StartBoard",
   robots: { index: false, follow: false },
 };
 

@@ -207,6 +207,23 @@ export async function permanentlyDeleteBookmark(clerkUserId: string, id: string)
   if (!results[2]?.length) throw new Error("Trashed bookmark not found.");
 }
 
+export async function restoreAllTrashedBookmarks(clerkUserId: string) {
+  await sql.transaction((tx) => [
+    tx`SET LOCAL ROLE starboard_app`,
+    tx`SELECT set_config('app.user_id', ${clerkUserId}, true)`,
+    tx`UPDATE bookmarks SET deleted_at = NULL, updated_at = now()
+       WHERE deleted_at IS NOT NULL`,
+  ]);
+}
+
+export async function permanentlyDeleteAllTrashedBookmarks(clerkUserId: string) {
+  await sql.transaction((tx) => [
+    tx`SET LOCAL ROLE starboard_app`,
+    tx`SELECT set_config('app.user_id', ${clerkUserId}, true)`,
+    tx`DELETE FROM bookmarks WHERE deleted_at IS NOT NULL`,
+  ]);
+}
+
 export async function getBookmarkPreviewTarget(clerkUserId: string, id: string) {
   const results = await sql.transaction((tx) => [
     tx`SET LOCAL ROLE starboard_app`,

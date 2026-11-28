@@ -3,8 +3,8 @@ import Link from "next/link";
 import { getSiteUrl } from "@/lib/site-url";
 
 const siteUrl = getSiteUrl();
-const title = "Privacy policy | Starboard";
-const description = "How Starboard handles account information, bookmarks, and connected services.";
+const title = "Privacy policy | StartBoard";
+const description = "How StartBoard handles account information, bookmarks, and connected services.";
 
 export const metadata: Metadata = {
   title,
@@ -18,10 +18,10 @@ export default function PrivacyPage() {
     <>
       <h1>Privacy policy</h1>
       <p className="mt-4 text-sm">Last updated: <time dateTime="2026-11-28">28 November 2026</time></p>
-      <p className="mt-6">This policy explains how Starboard, maintained by Razeev (@razeevascx), handles information when you use this website and its hosted bookmark dashboard. Browser extension features may also store information on your device; review the extension’s permissions before installing it.</p>
+      <p className="mt-6">This policy explains how StartBoard, maintained by Razeev (@razeevascx), handles information when you use this website and its hosted bookmark dashboard. Browser extension features may also store information on your device; review the extension’s permissions before installing it.</p>
       <section>
         <h2>Information we handle</h2>
-        <p>When you sign in, Clerk manages authentication. Starboard stores your account identifier, email address, and display name, together with bookmarks and collections you create or import, including their URLs, titles, descriptions, and organization. Our hosting and authentication providers may process technical information such as IP addresses, browser details, request logs, and session information to deliver and secure the service.</p>
+        <p>When you sign in, Clerk manages authentication. StartBoard stores your account identifier, email address, and display name, together with bookmarks and collections you create or import, including their URLs, titles, descriptions, and organization. Our hosting and authentication providers may process technical information such as IP addresses, browser details, request logs, and session information to deliver and secure the service.</p>
       </section>
       <section>
         <h2>How information is used</h2>
@@ -33,7 +33,7 @@ export default function PrivacyPage() {
       </section>
       <section>
         <h2>Service providers and external websites</h2>
-        <p>Clerk provides authentication, Neon provides the hosted database, and infrastructure providers process requests needed to run Starboard. When a bookmark preview is loaded, Starboard may request the saved URL to retrieve preview metadata; your browser may also request images or icons from external websites. Those websites receive the technical information associated with those requests and apply their own privacy policies.</p>
+        <p>Clerk provides authentication, Neon provides the hosted database, and infrastructure providers process requests needed to run StartBoard. When a bookmark preview is loaded, StartBoard may request the saved URL to retrieve preview metadata; your browser may also request images or icons from external websites. Those websites receive the technical information associated with those requests and apply their own privacy policies.</p>
       </section>
       <section>
         <h2>Connected apps and MCP</h2>

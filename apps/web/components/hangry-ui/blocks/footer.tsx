@@ -96,7 +96,7 @@ export const Footer = memo(function Footer({
           )}
           {children}
         </div>
-        <div className="grid grid-cols-2 gap-8">
+        <div className={cn("grid grid-cols-2 gap-8", groups.length > 2 && "lg:grid-cols-3")}>
           {groups.map((group) => (
             <nav key={group.title} aria-label={group.title}>
               <h3 className="mb-4 typography-subsection-title">{group.title}</h3>

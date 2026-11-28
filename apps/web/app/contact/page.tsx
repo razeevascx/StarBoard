@@ -7,16 +7,16 @@ import { getSiteUrl } from "@/lib/site-url";
 const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  title: "Contact | Starboard",
-  description: "Get in touch with the Starboard team.",
+  title: "Contact | StartBoard",
+  description: "Get in touch with the StartBoard team.",
   alternates: siteUrl
     ? { canonical: new URL("/contact", siteUrl).href }
     : undefined,
   openGraph: {
     type: "website",
-    siteName: "Starboard",
-    title: "Contact | Starboard",
-    description: "Get in touch with the Starboard team.",
+    siteName: "StartBoard",
+    title: "Contact | StartBoard",
+    description: "Get in touch with the StartBoard team.",
     url: siteUrl ? new URL("/contact", siteUrl).href : undefined,
   },
 };

@@ -20,10 +20,15 @@ const footerGroups = [
     links: [
       { label: "Install extension", href: installUrl },
       { label: "Contact", href: "/contact" },
-      { label: "Privacy policy", href: "/privacy" },
-      { label: "Terms and conditions", href: "/terms" },
       { label: "GitHub", href: githubUrl },
       { label: "X (@razeevascx)", href: "https://x.com/razeevascx" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { label: "Privacy policy", href: "/privacy" },
+      { label: "Terms and conditions", href: "/terms" },
     ],
   },
 ] as const;
@@ -32,10 +37,11 @@ export function Footer() {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-8 md:px-6">
       <HangryFooter
+        badgeLabel=""
         brandSlot={<Brand />}
         description="A calm, customizable browser start page for bookmarks, quick links, and everything you need in a new tab."
         groups={footerGroups}
-        copyright={`© ${new Date().getFullYear()} Starboard`}
+        copyright={`© ${new Date().getFullYear()} StartBoard`}
         className="rounded-lg border-ctp-surface1/60 bg-ctp-mantle/60"
         bottomRight={
           <div className="flex flex-wrap items-center gap-3">
@@ -71,7 +77,7 @@ export function Footer() {
               </Button>
               <Button asChild size="icon" variant="ghost" className="size-9">
                 <a
-                  aria-label="Starboard on GitHub"
+                  aria-label="StartBoard on GitHub"
                   href={githubUrl}
                   target="_blank"
                   rel="noreferrer noopener"

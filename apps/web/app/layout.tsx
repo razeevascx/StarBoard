@@ -19,20 +19,20 @@ const description = "A calm, customizable browser start page for bookmarks, quic
 
 export const metadata: Metadata = {
   metadataBase: siteUrl ?? undefined,
-  title: "Starboard — Your calm browser start page",
+  title: "StartBoard — Your calm browser start page",
   description,
-  applicationName: "Starboard",
+  applicationName: "StartBoard",
   openGraph: {
     type: "website",
-    siteName: "Starboard",
-    title: "Starboard — Your calm browser start page",
+    siteName: "StartBoard",
+    title: "StartBoard — Your calm browser start page",
     description,
     url: siteUrl?.href,
     locale: "en_GB",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Starboard — Your calm browser start page",
+    title: "StartBoard — Your calm browser start page",
     description,
   },
 };

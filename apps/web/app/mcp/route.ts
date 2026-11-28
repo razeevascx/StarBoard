@@ -48,8 +48,8 @@ const handler = createMcpHandler((server) => {
     "starboard_library_ui",
     STARBOARD_LIBRARY_UI_URI,
     {
-      title: "Starboard Library",
-      description: "Interactive bookmark, collection, and trash manager for Starboard.",
+      title: "StartBoard Library",
+      description: "Interactive bookmark, collection, and trash manager for StartBoard.",
       mimeType: MCP_APP_MIME_TYPE,
       icons: starboardIcons,
     },
@@ -140,7 +140,7 @@ const handler = createMcpHandler((server) => {
     return textResult("Bookmark restored.");
   });
 }, {
-  serverInfo: { name: "Starboard", version: "1.0.0" },
+  serverInfo: { name: "StartBoard", version: "1.0.0" },
 });
 
 const authHandler = mcpAuthOptions

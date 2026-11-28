@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Starboard — Your calm browser start page";
+export const alt = "StartBoard — Your calm browser start page";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -11,7 +11,7 @@ export default function OpenGraphImage() {
         <span style={{ display: "flex", width: 52, height: 52, alignItems: "center", justifyContent: "center", background: "#cba6f7" }}>
           <span style={{ display: "flex", width: 24, height: 24, transform: "rotate(45deg)", background: "#1e1e2e" }} />
         </span>
-        Starboard
+        StartBoard
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
         <div style={{ fontSize: 76, fontWeight: 800, letterSpacing: -3, lineHeight: 1.06 }}>A calmer place to start.</div>
